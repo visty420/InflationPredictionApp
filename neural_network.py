@@ -53,7 +53,7 @@ model = InflationPredictor(input_size=3)
 criterion = nn.MSELoss()  # Mean Squared Error Loss for regression
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-epochs = 100
+epochs = 1000
 for epoch in range(epochs):
     for inputs, labels in train_loader:
         optimizer.zero_grad()
@@ -63,3 +63,14 @@ for epoch in range(epochs):
         optimizer.step()
     
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
+
+
+current_month_features = np.array([309.685, 250.698, 19091])
+current_month_features_normalized = scaler.transform([current_month_features])
+current_month_tensor = torch.tensor(current_month_features_normalized, dtype=torch.float)
+
+model.eval()  
+with torch.no_grad():
+    predicted_inflation_rate = model(current_month_tensor).item()
+
+print(f"Predicted Inflation Rate: {predicted_inflation_rate}%")
