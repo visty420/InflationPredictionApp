@@ -1,0 +1,1 @@
+Inflation predictor : 3 layers, 85 neurons

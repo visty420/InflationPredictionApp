@@ -9,74 +9,108 @@ import numpy as np
 import optuna
 
 # Load the dataset
-df = pd.read_csv('economic_data.csv')  # Update the path to match where your file is located
+df = pd.read_csv('C:/Users/manea/Desktop/Licenta/InflationPredictionApp/economic_data.csv')  
 
+# Define features and target
 features = df[['CPIAUCSL', 'PPIACO', 'PCE']].values
 target = df['INFLRATE'].values
 
 # Normalize the features
 scaler = StandardScaler()
-features_normalized = scaler.fit_transform(features)
+X_normalized = scaler.fit_transform(features)
 
 # Split the dataset
-X_train, X_test, y_train, y_test = train_test_split(features_normalized, target, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_normalized, target, test_size=0.2, random_state=42)
 
-class DynamicInflationPredictor(nn.Module):
+# Define the PyTorch model
+class InflationPredictor(nn.Module):
     def __init__(self, input_size, num_layers, num_neurons):
-        super(DynamicInflationPredictor, self).__init__()
+        super(InflationPredictor, self).__init__()
         layers = [nn.Linear(input_size, num_neurons), nn.ReLU()]
-        for _ in range(num_layers - 1):
+        for _ in range(1, num_layers):
             layers += [nn.Linear(num_neurons, num_neurons), nn.ReLU()]
-        layers.append(nn.Linear(num_neurons, 1))
-        self.layers = nn.Sequential(*layers)
+        layers += [nn.Linear(num_neurons, 1)]
+        self.network = nn.Sequential(*layers)
         
     def forward(self, x):
-        return self.layers(x)
+        return self.network(x)
 
-# Define the objective function for Optuna
-def objective(trial):
-    # Hyperparameters to tune
+# Function to create the DataLoader
+def create_dataloader(X, y, batch_size=64):
+    tensor_X = torch.tensor(X, dtype=torch.float32)
+    tensor_y = torch.tensor(y, dtype=torch.float32)
+    dataset = TensorDataset(tensor_X, tensor_y)
+    return DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+# Prepare data loaders
+train_loader = create_dataloader(X_train, y_train)
+test_loader = create_dataloader(X_test, y_test)
+
+# Define the Optuna optimization function
+def optimize_model(trial):
+    # Hyperparameters to optimize
     lr = trial.suggest_float('lr', 1e-5, 1e-1, log=True)
     num_layers = trial.suggest_int('num_layers', 1, 5)
     num_neurons = trial.suggest_int('num_neurons', 10, 100)
-
-    model = DynamicInflationPredictor(input_size=3, num_layers=num_layers, num_neurons=num_neurons)
+    
+    # Create the model
+    model = InflationPredictor(input_size=3, num_layers=num_layers, num_neurons=num_neurons)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
-
-    # Convert to PyTorch tensors
-    X_train_tensor = torch.tensor(X_train, dtype=torch.float)
-    y_train_tensor = torch.tensor(y_train, dtype=torch.float)
-    train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
-    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
-
+    
     # Training loop
-    for epoch in range(100):  
-        model.train()
-        for data, target in train_loader:
+    for epoch in range(100):
+        for batch_X, batch_y in train_loader:
             optimizer.zero_grad()
-            output = model(data)
-            loss = criterion(output.squeeze(), target)
+            predictions = model(batch_X)
+            loss = criterion(predictions.squeeze(), batch_y)
             loss.backward()
             optimizer.step()
-
-    # Evaluation
+    
+    # Evaluation on test set
     model.eval()
+    test_loss = 0
     with torch.no_grad():
-        X_test_tensor = torch.tensor(X_test, dtype=torch.float)
-        y_test_tensor = torch.tensor(y_test, dtype=torch.float)
-        predictions = model(X_test_tensor)
-        test_loss = criterion(predictions.squeeze(), y_test_tensor)
+        for batch_X, batch_y in test_loader:
+            predictions = model(batch_X)
+            test_loss += criterion(predictions.squeeze(), batch_y).item()
+    test_loss /= len(test_loader)
+    
+    return test_loss
 
-    return test_loss.item()
+# Run Optuna study
+# study = optuna.create_study(direction='minimize')
+# study.optimize(optimize_model, n_trials=5000)
+# print(f"Best hyperparameters: {study.best_trial.params}")
 
-# Run the Optuna study
-study = optuna.create_study(direction='minimize')
-study.optimize(objective, n_trials=50)  # Adjust the number of trials if needed
+# Re-train the model with the best hyperparameters
+best_params ={ 
+    'lr':0.007066923822087133,
+    'num_layers':2,
+    'num_neurons':56
+}
+model = InflationPredictor(input_size=3, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'])
+optimizer = optim.Adam(model.parameters(), lr=best_params['lr'])
 
-print("Best hyperparameters:", study.best_trial.params)
+epochs = 1000
+criterion = nn.MSELoss()
+# Final training loop
+for epoch in range(epochs):
+    model.train()
+    for batch_X, batch_y in train_loader:
+        optimizer.zero_grad()
+        predictions = model(batch_X)
+        loss = criterion(predictions.squeeze(), batch_y)
+        loss.backward()
+        optimizer.step()
+    print(f'Epoch {epoch+1}: Loss = {loss.item()}')
 
-# Use the best hyperparameters to define your final model
-best_params = study.best_trial.params
-model = DynamicInflationPredictor(input_size=3, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'])
+current_month_features = np.array([309.685, 250.698, 19091])
+current_month_features_normalized = scaler.transform([current_month_features])
+current_month_tensor = torch.tensor(current_month_features_normalized, dtype=torch.float)
 
+model.eval()  
+with torch.no_grad():
+    predicted_inflation_rate = model(current_month_tensor).item()
+
+print(f"Predicted Inflation Rate: {predicted_inflation_rate}%")
