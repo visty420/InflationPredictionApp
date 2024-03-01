@@ -4,3 +4,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
+class FutureInflationPredictor(nn.Module):
+    def __init__(self, input_size, num_layers, num_neurons):
+        super(FutureInflationPredictor, self).__init__()
+        layers = [nn.Linear(input_size, num_neurons), nn.ReLU()]
+        for _ in range(1, num_layers):
+            layers.append(nn.Linear(num_neurons, num_neurons))
+            layers.append(nn.ReLU())
+        layers.append(nn.Linear(num_neurons, 1))
+        self.network = nn.Sequential(*layers)
+        
+    def forward(self, x):
+        return self.network(x)
