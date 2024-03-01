@@ -92,7 +92,7 @@ best_params ={
 model = InflationPredictor(input_size=3, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'])
 optimizer = optim.Adam(model.parameters(), lr=best_params['lr'])
 
-epochs = 1000
+epochs = 400
 criterion = nn.MSELoss()
 # Final training loop
 for epoch in range(epochs):
