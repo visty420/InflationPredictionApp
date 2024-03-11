@@ -17,7 +17,7 @@ def create_dataloader(X, y, batch_size=64):
     return DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 
-df = pd.read_csv('C:/Users/manea/Desktop/Licenta/InflationPredictionApp/economic_data.csv')  
+df = pd.read_csv('./economic_data.csv')  
 
 
 features = df[['CPIAUCSL', 'PPIACO', 'PCE']].values
@@ -47,16 +47,14 @@ fold_performances = []
 for fold, (train_idx, val_idx) in enumerate(kf.split(X_normalized, target)):
     print(f'Fold {fold+1}/{k_folds}')
 
-    # Create data loaders for this fold
+   
     train_loader = create_dataloader(X_normalized[train_idx], target[train_idx])
     val_loader = create_dataloader(X_normalized[val_idx], target[val_idx])
 
-    # Initialize the model with the best hyperparameters for this fold
     model = InflationPredictor(input_size=3, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'])
     optimizer = optim.Adam(model.parameters(), lr=best_params['lr'])
     criterion = nn.MSELoss()
 
-    # Train the model
     for epoch in range(epochs):
         model.train()
         for batch_X, batch_y in train_loader:
@@ -77,7 +75,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(X_normalized, target)):
     fold_performances.append(val_loss)
     print(f'Validation Loss for Fold {fold+1}: {val_loss}')
 
-# Calculate and print the average loss across all folds
+
 average_loss = np.mean(fold_performances)
 std_dev_loss = np.std(fold_performances)
 print(f'Average Validation Loss: {average_loss}')

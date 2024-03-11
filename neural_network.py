@@ -9,7 +9,8 @@ import numpy as np
 import optuna
 
 # Load the dataset
-df = pd.read_csv('C:/Users/manea/Desktop/Licenta/InflationPredictionApp/economic_data.csv')  
+# df = pd.read_csv('C:/Users/manea/Desktop/Licenta/InflationPredictionApp/economic_data.csv')  
+df = pd.read_csv('./economic_data.csv')  
 
 # Define features and target
 features = df[['CPIAUCSL', 'PPIACO', 'PCE']].values
@@ -22,7 +23,6 @@ X_normalized = scaler.fit_transform(features)
 # Split the dataset
 X_train, X_test, y_train, y_test = train_test_split(X_normalized, target, test_size=0.2, random_state=42)
 
-# Define the PyTorch model
 class InflationPredictor(nn.Module):
     def __init__(self, input_size, num_layers, num_neurons):
         super(InflationPredictor, self).__init__()
@@ -35,30 +35,30 @@ class InflationPredictor(nn.Module):
     def forward(self, x):
         return self.network(x)
 
-# Function to create the DataLoader
+
 def create_dataloader(X, y, batch_size=64):
     tensor_X = torch.tensor(X, dtype=torch.float32)
     tensor_y = torch.tensor(y, dtype=torch.float32)
     dataset = TensorDataset(tensor_X, tensor_y)
     return DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-# Prepare data loaders
+
 train_loader = create_dataloader(X_train, y_train)
 test_loader = create_dataloader(X_test, y_test)
 
 # Define the Optuna optimization function
 def optimize_model(trial):
-    # Hyperparameters to optimize
+    
     lr = trial.suggest_float('lr', 1e-5, 1e-1, log=True)
     num_layers = trial.suggest_int('num_layers', 1, 5)
     num_neurons = trial.suggest_int('num_neurons', 10, 100)
     
-    # Create the model
+    
     model = InflationPredictor(input_size=3, num_layers=num_layers, num_neurons=num_neurons)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
     
-    # Training loop
+   
     for epoch in range(100):
         for batch_X, batch_y in train_loader:
             optimizer.zero_grad()
@@ -67,7 +67,7 @@ def optimize_model(trial):
             loss.backward()
             optimizer.step()
     
-    # Evaluation on test set
+    
     model.eval()
     test_loss = 0
     with torch.no_grad():
