@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader, TensorDataset
 import torch.nn as nn
 import torch.optim as optim
 from recurrent_neural_network import InflationRNN, train_model, prepare_data  
+from sklearn.metrics import r2_score
 
 file_path = './economic_data.csv'  # Update this path as necessary
 df = pd.read_csv(file_path)
@@ -38,24 +39,42 @@ model = InflationRNN(input_size=3, hidden_size=50, num_layers=2, output_size=1)
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-num_epochs = 100
+num_epochs = 400
 train_model(model, train_loader, criterion, optimizer, num_epochs)
 
 
 
-latest_data = df[-255:]  # Adjust this based on your actual window size
+latest_data = df[-255:]  
 features = latest_data[['CPIAUCSL', 'PPIACO', 'PCE']]
-features_scaled = scaler.transform(features)  # Use the same scaler as during training
+features_scaled = scaler.transform(features) 
 
-# Reshape the data to match the input format expected by PyTorch: [1, sequence_length, num_features]
+
 input_data = np.array([features_scaled])
 input_tensor = torch.tensor(input_data, dtype=torch.float32)
 
-# Make the prediction
-model.eval()  # Ensure the model is in evaluation mode
-with torch.no_grad():  # No gradients needed for prediction
+
+model.eval()  
+with torch.no_grad():  
     prediction = model(input_tensor)
 
-# Display the prediction
-predicted_inflation_rate = prediction.item()  # Convert to a Python number
+
+predicted_inflation_rate = prediction.item()  
 print(f"Predicted Inflation Rate: {predicted_inflation_rate:.4f}%")
+
+
+model.eval()  
+all_predictions = []
+all_targets = []
+
+with torch.no_grad():  
+    for inputs, targets in test_loader:
+        outputs = model(inputs)
+        all_predictions.extend(outputs.view(-1).cpu().numpy())  
+        all_targets.extend(targets.view(-1).cpu().numpy())
+
+all_predictions = np.array(all_predictions)
+all_targets = np.array(all_targets)
+
+r2 = r2_score(all_targets, all_predictions)
+print(f"R-squared Score: {r2 * 100:.2f}%")
+
