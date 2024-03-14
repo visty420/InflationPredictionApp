@@ -41,3 +41,21 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 num_epochs = 100
 train_model(model, train_loader, criterion, optimizer, num_epochs)
 
+
+
+latest_data = df[-255:]  # Adjust this based on your actual window size
+features = latest_data[['CPIAUCSL', 'PPIACO', 'PCE']]
+features_scaled = scaler.transform(features)  # Use the same scaler as during training
+
+# Reshape the data to match the input format expected by PyTorch: [1, sequence_length, num_features]
+input_data = np.array([features_scaled])
+input_tensor = torch.tensor(input_data, dtype=torch.float32)
+
+# Make the prediction
+model.eval()  # Ensure the model is in evaluation mode
+with torch.no_grad():  # No gradients needed for prediction
+    prediction = model(input_tensor)
+
+# Display the prediction
+predicted_inflation_rate = prediction.item()  # Convert to a Python number
+print(f"Predicted Inflation Rate: {predicted_inflation_rate:.4f}%")
