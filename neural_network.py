@@ -78,10 +78,6 @@ def optimize_model(trial):
     
     return test_loss
 
-# Run Optuna study
-# study = optuna.create_study(direction='minimize')
-# study.optimize(optimize_model, n_trials=5000)
-# print(f"Best hyperparameters: {study.best_trial.params}")
 
 # Re-train the model with the best hyperparameters
 best_params ={ 
