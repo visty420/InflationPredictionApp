@@ -9,7 +9,7 @@ import numpy as np
 
 # Assuming 'df' is your loaded DataFrame with the consolidated data
 # Load the data
-df = pd.read_csv('./augumented_economic_data.csv')
+df = pd.read_csv('./augmented_economic_data.csv')
 
 # Define features and target
 features = df[['CPIAUCSL', 'PPIACO', 'PCE', 'FEDFUNDS', 'UNRATE', 'GDP', 'M2SL', 'UMCSENT', 'Overall Wage Growth']].values
@@ -21,6 +21,13 @@ X_normalized = scaler.fit_transform(features)
 
 # Split the dataset
 X_train, X_test, y_train, y_test = train_test_split(X_normalized, target, test_size=0.2, random_state=42)
+
+best_params = {
+    'lr': 0.000952163930520129,
+    'num_layers': 3,
+    'num_neurons': 98,
+    'epochs': 663  
+}
 
 class InflationPredictor(nn.Module):
     def __init__(self, input_size, num_layers, num_neurons):
@@ -46,13 +53,12 @@ train_loader = create_dataloader(X_train, y_train)
 test_loader = create_dataloader(X_test, y_test)
 
 # Initialize the model, loss criterion, and optimizer
-model = InflationPredictor(input_size=9, num_layers=3, num_neurons=50)
+model = InflationPredictor(input_size=9, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'])
+optimizer = optim.Adam(model.parameters(), lr=best_params['lr'])
 criterion = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# Training loop
-epochs = 100
-for epoch in range(epochs):
+
+for epoch in range(best_params['epochs']):
     model.train()
     for batch_X, batch_y in train_loader:
         optimizer.zero_grad()
@@ -62,8 +68,6 @@ for epoch in range(epochs):
         optimizer.step()
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
 
-# Prediction (example)
-# Normalize your new input features using the same scaler
 new_features = np.array([[309.685, 250.698, 19091, 5.33, 3.7, 28385.434, 20781.8, 79, 5.2]])  
 new_features_normalized = scaler.transform(new_features)
 new_features_tensor = torch.tensor(new_features_normalized, dtype=torch.float32)

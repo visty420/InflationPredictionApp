@@ -8,8 +8,6 @@ import pandas as pd
 import numpy as np
 import optuna
 
-# Load the dataset
-# df = pd.read_csv('C:/Users/manea/Desktop/Licenta/InflationPredictionApp/economic_data.csv')  
 df = pd.read_csv('./economic_data.csv')  
 
 # Define features and target
