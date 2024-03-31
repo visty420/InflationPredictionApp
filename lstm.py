@@ -39,8 +39,8 @@ class LSTMModel(nn.Module):
 # Hyperparameters from Optuna study
 optimal_params = {
     'lr': 0.09903400349769692,
-    'num_layers':3,
-    'hidden_dim': 29,
+    'num_layers':2,
+    'hidden_dim': 32,
     'dropout_rate': 0.02061234092208354,
     'batch_size': 29
 }
