@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 # Load your dataset
 df = pd.read_csv('augmented_economic_data.csv', parse_dates=['DATE'])
-ts = df['INFLRATE']  # Replace with your actual time series column name
+ts = df['INFLRATE']  
 ts_diff = ts.diff().dropna()
 # Convert to numeric and drop NaN values
 ts = pd.to_numeric(ts, errors='coerce').dropna()
@@ -18,7 +18,7 @@ adf_result = adfuller(ts)
 print(f'ADF Statistic: {adf_result[0]}')
 print(f'p-value: {adf_result[1]}')
 
-# Assuming non-stationarity has been addressed, calculate ACF and PACF for lag value selection
+#calculate ACF and PACF for lag value selection
 acf_values = acf(ts, nlags=20)
 pacf_values = pacf(ts, nlags=20)
 
