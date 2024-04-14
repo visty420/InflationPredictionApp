@@ -46,7 +46,7 @@ def train_and_evaluate_model(train_loader, val_loader, input_size, num_layers, n
 
 if __name__ == '__main__':
     # Load and preprocess the dataset
-    df = pd.read_csv('./augmented_economic_data.csv')
+    df = pd.read_csv('./Backend/Data/augmented_economic_data.csv')
     features = df[['CPIAUCSL', 'PPIACO', 'PCE', 'FEDFUNDS', 'UNRATE', 'GDP', 'M2SL', 'UMCSENT', 'Overall Wage Growth']].values
     target = df['INFLRATE'].values
     scaler = StandardScaler()

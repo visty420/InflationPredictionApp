@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.metrics import r2_score
 
 # Assuming the DataFrame 'df' and necessary imports are already defined
-df = pd.read_csv('./augmented_economic_data.csv')
+df = pd.read_csv('./Backend/Data/augmented_economic_data.csv')
 
 # Define the LSTM model class
 class OptunaLSTM(nn.Module):

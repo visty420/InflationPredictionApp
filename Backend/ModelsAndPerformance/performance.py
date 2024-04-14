@@ -16,7 +16,7 @@ def create_dataloader(X, y, batch_size=64):
     return DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 # Load and preprocess the dataset
-df = pd.read_csv('./economic_data.csv')
+df = pd.read_csv('./Backend/Data/economic_data.csv')
 features = df[['CPIAUCSL', 'PPIACO', 'PCE']].values
 target = df['INFLRATE'].values
 scaler = StandardScaler()

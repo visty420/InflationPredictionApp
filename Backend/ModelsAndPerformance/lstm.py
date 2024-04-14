@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 
 
-df = pd.read_csv('./augmented_economic_data.csv')
+df = pd.read_csv('./Backend/Data/augmented_economic_data.csv')
 
 features = df[['CPIAUCSL', 'PPIACO', 'PCE', 'FEDFUNDS', 'UNRATE', 'GDP', 'M2SL', 'UMCSENT', 'Overall Wage Growth']].values
 target = df['INFLRATE'].values.reshape(-1, 1)

@@ -9,7 +9,7 @@ import torch.optim as optim
 from recurrent_neural_network import InflationRNN, train_model, prepare_data  
 from sklearn.metrics import r2_score
 
-file_path = './economic_data.csv'  
+file_path = './Backend/Data/economic_data.csv'  
 df = pd.read_csv(file_path)
 
 features = df[['CPIAUCSL', 'PPIACO', 'PCE']]

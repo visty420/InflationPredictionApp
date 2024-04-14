@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import optuna
 
-df = pd.read_csv('./economic_data.csv')  
+df = pd.read_csv('./Backend/Data/economic_data.csv')  
 
 # Define features and target
 features = df[['CPIAUCSL', 'PPIACO', 'PCE']].values
