@@ -9,7 +9,7 @@ import numpy as np
 
 
 # Load the data
-df = pd.read_csv('./Backend/Data/augmented_economic_data.csv')
+df = pd.read_csv('./Backend/Data/complete_data.csv')
 
 # Define features and target
 features = df[['CPIAUCSL', 'PPIACO', 'PCE', 'FEDFUNDS', 'UNRATE', 'GDP', 'M2SL', 'UMCSENT', 'Overall Wage Growth']].values
