@@ -1,0 +1,30 @@
+CPI - 1947
+FEDFUNDS - 2003
+M2SL - 1959
+PCE - 1959
+PPI - 1913
+UMSCENT - 1953
+UNRATE - 1948
+WAGEGROWTH - 1997
+GDP - 1947
+
+Filling fedfunds:  A reasonable compromise might be to segment the missing period into a few broad economic eras, each characterized by distinct average Federal Funds Rates based on historical data:
+
+    1959-1969: The early period of relatively stable economic growth in the US, before the high inflation of the 1970s.
+    1970-1982: Characterized by high inflation, leading to high interest rates, especially towards the end of this period.
+    1983-2002: A period of declining inflation and generally lower interest rates compared to the late 1970s and early 1980s.
+
+For simplicity, I'll assume:
+
+    An average rate of 4% for 1959-1969, reflecting a stable but growing economy.
+    An average rate of 10% for 1970-1982, acknowledging the high inflation and the Federal Reserve's aggressive rate hikes to combat it.
+    An average rate of 5.5% for 1983-2002, considering the disinflation period and relatively lower rates.
+
+Filling UMCSENT: The "UMCSENT.csv" dataset contains monthly data on the University of Michigan Consumer Sentiment Index from November 1952 through January 2024. It appears there are some missing values denoted by "." in the dataset, which we'll need to handle.
+
+To fill in the monthly values from January 1, 1959, up to where they are complete, we first need to address the existing missing values. Since this dataset already starts before 1959, our task will primarily involve imputing the missing values rather than extending the dataset backward.
+
+Given the nature of consumer sentiment data, which can fluctuate significantly based on economic conditions, political events, and other factors, a simple average might not be the best method for filling in missing values. Instead, we might consider methods that can account for the time series nature of the data, such as:
+
+    Linear interpolation, to smoothly estimate missing values based on neighboring points.
+    Forward fill or backward fill, to assume the sentiment index remains unchanged from the last available month. 

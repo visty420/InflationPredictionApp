@@ -68,6 +68,10 @@ for epoch in range(best_params['epochs']):
         optimizer.step()
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
 
+MODEL_PATH = './Backend/SavedModels/model_sate_dict'
+
+torch.save(model.state_dict(), MODEL_PATH)
+
 new_features = np.array([[29.11,31.7,318.2,4,5,524.2403333,294.1,95.05,3.918944099]])  
 
 row_features = np.array([[29.15,31.7,317.8,4,5.1,525.034,295.2,94.8,3.918944]])

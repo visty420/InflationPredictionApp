@@ -23,7 +23,7 @@ class InflationPredictor(nn.Module):
 
 # Initialize the model, assuming state_dict has been loaded
 model = InflationPredictor(input_size=9, num_layers=3, num_neurons=98)
-# model.load_state_dict(torch.load('path_to_your_model_state_dict.pt'))
+model.load_state_dict(torch.load('./Backend/SavedModels/model_sate_dict'))
 model.eval()
 
 # Define features
@@ -48,4 +48,4 @@ df['Predicted INFLRATE'] = predictions
 print(df)
 
 # Save the dataframe to a new CSV if needed
-df.to_csv('./predictions.csv', index=False)
+df.to_csv('./Auxiliaries/predictions.csv', index=False)
