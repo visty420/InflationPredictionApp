@@ -7,3 +7,13 @@ LSTM : optimal_params = {
     'dropout_rate': 0.02061234092208354,
     'batch_size': 29
 }
+
+
+LSTM : Best trial: {'lr': 0.09946134887537468, 'num_layers': 1, 'hidden_dim': 172, 'dropout_rate': 0.1670573438218575, 'batch_size': 29}
+
+Best trial: {'lr': 0.08789878727104887, 'num_layers': 1, 'hidden_dim': 176, 'dropout_rate': 0.14844554409006022, 'batch_size': 37}
+
+Best trial: {'lr': 0.09260314547300764, 'num_layers': 1, 'hidden_dim': 99, 'dropout_rate': 0.2621896273035451, 'batch_size': 57} 
+
+
+Best trial: {'lr': 0.05689607838852533, 'num_layers': 1, 'hidden_dim': 31, 'dropout_rate': 0.16652487982507866, 'batch_size': 33} - best
