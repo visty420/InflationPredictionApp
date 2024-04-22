@@ -69,7 +69,7 @@ train_loader = create_dataloader(X_train, y_train, batch_size=optimal_params['ba
 test_loader = create_dataloader(X_test, y_test, batch_size=optimal_params['batch_size'], shuffle=False)
 
 # Training the model
-num_epochs = 300
+num_epochs = 163
 model.train()
 for epoch in range(num_epochs):
     for inputs, targets in train_loader:
