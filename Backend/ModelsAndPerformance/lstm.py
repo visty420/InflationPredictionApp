@@ -47,11 +47,11 @@ class LSTMModel(nn.Module):
 
 # Hyperparameters and model instantiation
 optimal_params = {
-    'lr': 0.09903400349769692,
+    'lr': 0.05689607838852533,
     'num_layers': 2,
-    'hidden_dim': 32,
-    'dropout_rate': 0.02061234092208354,
-    'batch_size': 29
+    'hidden_dim': 31,
+    'dropout_rate': 0.16652487982507866,
+    'batch_size': 33
 }
 model = LSTMModel(input_dim=X_train.shape[2], hidden_dim=optimal_params['hidden_dim'], num_layers=optimal_params['num_layers'], output_dim=1, dropout_rate=optimal_params['dropout_rate'])
 optimizer = optim.Adam(model.parameters(), lr=optimal_params['lr'])

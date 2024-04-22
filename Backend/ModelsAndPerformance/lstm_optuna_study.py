@@ -10,9 +10,8 @@ import numpy as np
 from sklearn.metrics import r2_score
 
 # Assuming the DataFrame 'df' and necessary imports are already defined
-df = pd.read_csv('./Backend/Data/augmented_economic_data.csv')
+df = pd.read_csv('./Backend/Data/complete_data.csv')
 
-# Define the LSTM model class
 class OptunaLSTM(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_layers, output_dim, dropout_rate):
         super(OptunaLSTM, self).__init__()
@@ -27,10 +26,10 @@ class OptunaLSTM(nn.Module):
 # Objective function to be optimized
 def objective(trial):
     # Hyperparameters to be optimized
-    lr = trial.suggest_loguniform('lr', 1e-5, 1e-1)
+    lr = trial.suggest_float('lr', 1e-5, 1e-1, log=True)
     num_layers = trial.suggest_int('num_layers', 1, 3)
     hidden_dim = trial.suggest_int('hidden_dim', 20, 200)
-    dropout_rate = trial.suggest_uniform('dropout_rate', 0.0, 0.5)
+    dropout_rate = trial.suggest_float('dropout_rate', 0.0, 0.5)
     batch_size = trial.suggest_int('batch_size', 16, 128)
 
     # Model, criterion, and optimizer
@@ -47,7 +46,7 @@ def objective(trial):
         for batch_X, batch_y in train_loader:
             optimizer.zero_grad()
             predictions = model(batch_X)
-            loss = criterion(predictions, batch_y)
+            loss = criterion(predictions, batch_y.view(-1, 1))  # Ensure the target tensor has the correct shape
             loss.backward()
             optimizer.step()
 
@@ -90,6 +89,6 @@ test_loader = DataLoader(TensorDataset(X_test_tensor, y_test_tensor), batch_size
 
 # Create an Optuna study object and optimize the objective
 study = optuna.create_study(direction='maximize')
-study.optimize(objective, n_trials=5000)  # Adjust the number of trials based on computational resources
+study.optimize(objective, n_trials=500)  # Adjust the number of trials based on computational resources
 
 print('Best trial:', study.best_trial.params)
