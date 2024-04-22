@@ -45,7 +45,7 @@ def train_and_evaluate_model(train_loader, val_loader, input_size, num_layers, n
     return r2
 
 if __name__ == '__main__':
-    # Load and preprocess the dataset
+    
     df = pd.read_csv('./Backend/Data/complete_data.csv')
     features = df[['CPIAUCSL', 'PPIACO', 'PCE', 'FEDFUNDS', 'UNRATE', 'GDP', 'M2SL', 'UMCSENT', 'Overall Wage Growth']].values
     target = df['INFLRATE'].values
@@ -66,16 +66,16 @@ if __name__ == '__main__':
     for fold, (train_idx, val_idx) in enumerate(kf.split(X_normalized, target)):
         print(f'Fold {fold+1}/{k_folds}')
         
-        # Prepare data loaders
+        
         train_loader = create_dataloader(X_normalized[train_idx], target[train_idx])
         val_loader = create_dataloader(X_normalized[val_idx], target[val_idx])
 
-        # Initialize model, criterion, and optimizer with the best hyperparameters
+        
         model = InflationPredictor(input_size=9, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'])
         optimizer = optim.Adam(model.parameters(), lr=best_params['lr'])
         criterion = nn.MSELoss()
 
-        # Train and evaluate the model
+       
         r2 = train_and_evaluate_model(train_loader, val_loader, input_size=9, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'], lr=best_params['lr'], epochs=best_params['epochs'])
         r2_scores.append(r2)
         print(f'R-squared Score for Fold {fold+1}: {r2:.4f}')
@@ -86,9 +86,3 @@ if __name__ == '__main__':
     print(f'Average R-squared Score: {average_r2 * 100:.2f}%')
     print(f'Standard Deviation of R-squared Scores: {std_dev_r2 * 100:.2f}%')
 
-    # # Optuna optimization
-    # study = optuna.create_study(direction='maximize')
-    # study.optimize(objective, n_trials=100)  # Adjust the number of trials as needed
-    
-    # print(f'Best hyperparameters: {study.best_params}')
-    

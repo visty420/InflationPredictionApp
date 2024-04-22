@@ -1,3 +1,4 @@
+import joblib
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -78,6 +79,9 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
+
+torch.save(model.state_dict(), './Backend/SavedModels/lstm_model_state_dict.pth')
+joblib.dump(scaler, './Backend/SavedModels/lstm_scaler.gz')
 
 # Evaluating the model
 model.eval()
