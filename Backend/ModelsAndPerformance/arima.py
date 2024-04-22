@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 # Load your dataset
 df = pd.read_csv('./Backend/Data/augmented_economic_data.csv', parse_dates=['DATE'])
-ts = df['INFLRATE']  
+ts = df['INFLRATE'] 
 ts_diff = ts.diff().dropna()
 # Convert to numeric and drop NaN values
 ts = pd.to_numeric(ts, errors='coerce').dropna()
