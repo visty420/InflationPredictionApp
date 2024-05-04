@@ -1,3 +1,4 @@
+import joblib
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -74,7 +75,8 @@ with torch.no_grad():
     all_predictions = [model(inputs).view(-1).cpu().numpy() for inputs, targets in test_loader]
     all_targets = [targets.view(-1).cpu().numpy() for inputs, targets in test_loader]
 
-torch.save(model, './Backend/SavedModels/inflation_rnn_model_full.pth')
+torch.save(model, './Backend/SavedModels/rnn.pth')
+joblib.dump(scaler, './Backend/SavedModels/rnn_scaler.gz')
 
 all_predictions = np.concatenate(all_predictions)
 all_targets = np.concatenate(all_targets)

@@ -1,3 +1,4 @@
+import joblib
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -108,5 +109,6 @@ with torch.no_grad():
     predicted_inflation_rate = model(current_month_tensor).item()
 
 torch.save(model, './Backend/SavedModels/inflation_predictor_threeinputs_model.pth')
+joblib.dump(scaler, './Backend/SavedModels/three_inputs_nlp_scaler.gz')
 
 print(f"Predicted Inflation Rate: {predicted_inflation_rate}%")
