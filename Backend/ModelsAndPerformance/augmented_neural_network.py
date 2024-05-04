@@ -1,3 +1,4 @@
+import joblib
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -68,9 +69,9 @@ for epoch in range(best_params['epochs']):
         optimizer.step()
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
 
-MODEL_PATH = './Backend/SavedModels/model_sate_dict'
 
-torch.save(model.state_dict(), MODEL_PATH)
+torch.save(model.state_dict(), './Backend/SavedModels/nlp')
+joblib.dump(scaler, './Backend/SavedModels/nlp_scaler.gz')
 
 new_features = np.array([[29.11,31.7,318.2,4,5,524.2403333,294.1,95.05,3.918944099]])  
 
