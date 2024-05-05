@@ -12,3 +12,10 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+from pydantic import BaseModel
+
+class UserCreate(BaseModel):
+    username: str
+    email: str
+    password: str
