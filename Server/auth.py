@@ -16,7 +16,7 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
             login_user(user, remember=True)
-            return redirect(url_for('main.profile'))  # Presupunând că există o rută 'profile'
+            return redirect(url_for('main.profile'))  
         else:
             flash('Please check your login details and try again.')
     return render_template('login.html')
