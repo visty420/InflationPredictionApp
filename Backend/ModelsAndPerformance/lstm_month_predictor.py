@@ -50,7 +50,7 @@ model, scaler = load_model_and_scaler(model_path, scaler_path)
 months_to_predict = 12
 
 initial_data = df.iloc[-12:, 1:-1].values
-model.eval()
 
+model.eval()
 predictions = predict_future_inflation(model, scaler, initial_data, months_to_predict)
 print(predictions)
