@@ -1,11 +1,10 @@
-from dbm import _Database
 from fastapi import FastAPI, Request, Form, HTTPException, Depends, status
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from . import crud, models, schemas, auth
-from database import get_db
-from database import async_session
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession 
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="Frontend"), name="static")
@@ -27,13 +26,7 @@ def get_register(request: Request):
 
 
 @app.post("/register")
-async def register_user(
-    request: Request, 
-    username: str = Form(...), 
-    password: str = Form(...), 
-    email: str = Form(...),
-    db: AsyncSession = Depends(get_db)  # Înlocuiește _Database.get_db cu get_db
-):
+async def register_user(request: Request, username: str = Form(...), password: str = Form(...), email: str = Form(...), db: AsyncSession = Depends(models.get_db)):
     user_data = schemas.UserCreate(username=username, email=email, password=password)
     new_user = await crud.create_user(db, user_data)
-    return {"username": new_user.username, "email": new_user.email}
+    return {"message": "Utilizator înregistrat cu succes!"}
