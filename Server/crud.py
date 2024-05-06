@@ -6,9 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-async def get_user(db: AsyncSession, user_id: int):
-    return await db.execute(select(models.User).filter(models.User.id == user_id)).scalars().first()
-
+async def get_user(username: str, db: AsyncSession):
+    result = await db.execute(select(models.User).filter(models.User.username == username))
+    return result.scalars().first()
 
 async def create_user(db: AsyncSession, user_data: schemas.UserCreate):
     db_user = models.User(

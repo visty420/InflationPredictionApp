@@ -4,16 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="static/Style/login.css">
+    <link rel="stylesheet" href="/static/Style/login.css"> <!-- Ensure the path is correct -->
 </head>
 <body>
-    <h1>Login</h1>
-    <form action="/login" method="post">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username"><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password"><br><br>
-        <input type="submit" value="Login">
-    </form>
+    <header>
+        <h1>Welcome to Our Service</h1>
+    </header>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/register">Register</a>
+    </nav>
+    <div class="container">
+        <h2>Login</h2> 
+        <form action="/login" method="post">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required class="form-input">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required class="form-input">
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Login" class="form-button">
+            </div>
+        </form>
+    </div>
+    <footer>
+        <p>© 2024 Our Service. All rights reserved.</p>
+    </footer>
 </body>
 </html>
