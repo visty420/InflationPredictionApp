@@ -12,8 +12,6 @@
             <a href="/">Home</a>
             <a href="/login">Login</a>
             <a href="/register">Register</a>
-            <!-- Only show if user is authenticated -->
-            {% if request.user.is_authenticated %}
                 <a href="/logout">Logout</a>
                 <span>Hello, {{ request.user.username }}</span>
             {% else %}
