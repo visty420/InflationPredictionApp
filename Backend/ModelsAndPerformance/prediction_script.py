@@ -34,11 +34,9 @@ features_tensor = torch.tensor(features_normalized, dtype=torch.float32)
 with torch.no_grad():
     predictions = model(features_tensor).numpy()
 
-# Add the predictions to the dataframe
+
 df['Predicted INFLRATE'] = predictions
 
-# Show the dataframe with the predictions
 print(df)
 
-# Save the dataframe to a new CSV if needed
 df.to_csv('./Auxiliaries/predictions.csv', index=False)

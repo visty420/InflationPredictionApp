@@ -19,28 +19,27 @@ def predict_future_inflation(model, scaler, initial_data, months_to_predict):
     predictions = []
 
     for _ in range(months_to_predict):
-        # Get the last sequence from initial data for prediction
+    
         current_sequence = initial_data[-1].reshape(1, -1)
 
-        # Scale the current sequence
+        
         current_sequence_scaled = scaler.transform(current_sequence)
 
-        # Convert to tensor
+ 
         sequence_tensor = torch.tensor(current_sequence_scaled, dtype=torch.float32).unsqueeze(0)
 
-        # Predict
+
         with torch.no_grad():
             prediction = model(sequence_tensor).cpu().numpy().flatten()[0]
 
-        # Inverse transform the prediction by creating a full feature array
+       
         full_feature_array = np.zeros((1, len(scaler.scale_)))
-        full_feature_array[0, 0] = prediction  # We only have a prediction for the first feature
+        full_feature_array[0, 0] = prediction  
         predicted_inflation = scaler.inverse_transform(full_feature_array)[0, 0]
 
         predictions.append(predicted_inflation)
         new_data_point = np.hstack((predicted_inflation, initial_data[-1, 1:]))
-        initial_data = np.vstack((initial_data[1:], new_data_point))  # Drop the oldest, append the new
-
+        initial_data = np.vstack((initial_data[1:], new_data_point))  
     return predictions
 
 model_path = './Backend/SavedModels/lstm_model_state_dict.pth'

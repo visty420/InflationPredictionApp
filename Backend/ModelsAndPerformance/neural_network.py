@@ -45,7 +45,7 @@ def create_dataloader(X, y, batch_size=64):
 train_loader = create_dataloader(X_train, y_train)
 test_loader = create_dataloader(X_test, y_test)
 
-# Define the Optuna optimization function
+
 def optimize_model(trial):
     
     lr = trial.suggest_float('lr', 1e-5, 1e-1, log=True)
@@ -78,7 +78,6 @@ def optimize_model(trial):
     return test_loss
 
 
-# Re-train the model with the best hyperparameters
 best_params ={ 
     'lr':0.007066923822087133,
     'num_layers':2,
@@ -89,7 +88,7 @@ optimizer = optim.Adam(model.parameters(), lr=best_params['lr'])
 
 epochs = 400
 criterion = nn.MSELoss()
-# Final training loop
+
 for epoch in range(epochs):
     model.train()
     for batch_X, batch_y in train_loader:

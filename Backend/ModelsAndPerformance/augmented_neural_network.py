@@ -9,18 +9,18 @@ import pandas as pd
 import numpy as np
 
 
-# Load the data
+
 df = pd.read_csv('./Backend/Data/complete_data.csv')
 
-# Define features and target
+
 features = df[['CPIAUCSL', 'PPIACO', 'PCE', 'FEDFUNDS', 'UNRATE', 'GDP', 'M2SL', 'UMCSENT', 'Overall Wage Growth']].values
 target = df['INFLRATE'].values
 
-# Normalize the features
+
 scaler = StandardScaler()
 X_normalized = scaler.fit_transform(features)
 
-# Split the dataset
+
 X_train, X_test, y_train, y_test = train_test_split(X_normalized, target, test_size=0.2, random_state=42)
 
 best_params = {
@@ -42,18 +42,17 @@ class InflationPredictor(nn.Module):
     def forward(self, x):
         return self.network(x)
 
-# Function to create data loaders
+
 def create_dataloader(X, y, batch_size=64):
     tensor_X = torch.tensor(X, dtype=torch.float32)
     tensor_y = torch.tensor(y, dtype=torch.float32).view(-1, 1)  # Adjust shape for regression
     dataset = TensorDataset(tensor_X, tensor_y)
     return DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-# Create dataloaders
+
 train_loader = create_dataloader(X_train, y_train)
 test_loader = create_dataloader(X_test, y_test)
 
-# Initialize the model, loss criterion, and optimizer
 model = InflationPredictor(input_size=9, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'])
 optimizer = optim.Adam(model.parameters(), lr=best_params['lr'])
 criterion = nn.MSELoss()
@@ -81,7 +80,6 @@ row_features = np.array([[29.15,31.7,317.8,4,5.1,525.034,295.2,94.8,3.918944]])
 new_features_normalized = scaler.transform(new_features)
 new_features_tensor = torch.tensor(new_features_normalized, dtype=torch.float32)
 
-# Normalize and convert feature vector row2
 row_normalized = scaler.transform(row_features)
 row_tensor = torch.tensor(row_normalized, dtype=torch.float32)
 

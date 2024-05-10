@@ -22,7 +22,7 @@ def train_and_evaluate_model(train_loader, val_loader, input_size, num_layers, n
     optimizer = optim.Adam(model.parameters(), lr=lr)
     criterion = nn.MSELoss()
 
-    # Training loop
+    
     for epoch in range(epochs):
         model.train()
         for batch_X, batch_y in train_loader:
@@ -32,7 +32,7 @@ def train_and_evaluate_model(train_loader, val_loader, input_size, num_layers, n
             loss.backward()
             optimizer.step()
 
-    # Evaluation loop
+    
     model.eval()
     predictions, actuals = [], []
     with torch.no_grad():
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     k_folds = 10
     kf = KFold(n_splits=k_folds, shuffle=True, random_state=42)
 
-    # Best hyperparameters from the Optuna study
+
     best_params = {
         'lr': 0.000952163930520129,
         'num_layers': 3,
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         r2_scores.append(r2)
         print(f'R-squared Score for Fold {fold+1}: {r2:.4f}')
 
-    # Calculate average and standard deviation of R-squared scores
+  
     average_r2 = np.mean(r2_scores)
     std_dev_r2 = np.std(r2_scores)
     print(f'Average R-squared Score: {average_r2 * 100:.2f}%')
