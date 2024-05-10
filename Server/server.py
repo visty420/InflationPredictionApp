@@ -41,22 +41,20 @@ def get_register(request: Request):
 
 @app.post("/register")
 async def register_user(request: Request, username: str = Form(...), password: str = Form(...), email: str = Form(...), db: AsyncSession = Depends(models.get_db)):
-    print(f"Received username: {username}, email: {email}, password: {password}")  # Debug output
-    
-    # Validate email
+            # Validate email
     if not re.match(EMAIL_REGEX, email):
-        print("Email validation failed")  # Debug output
+        print("Email validation failed")  
         return HTMLResponse(content="<script>alert('Invalid email format'); window.location='/register';</script>")
     
     # Validate password
     if not re.match(PASSWORD_REGEX, password):
-        print("Password validation failed")  # Debug output
+        print("Password validation failed")  
         return HTMLResponse(content="<script>alert('Password must contain at least 8 characters, including an uppercase letter, a symbol, and a digit'); window.location='/register';</script>")
 
     # Proceed with user creation if validations pass
     user_data = schemas.UserCreate(username=username, email=email, password=password)
     new_user = await crud.create_user(db, user_data)
-    print("User created successfully")  # Debug output
+    print("User created successfully")
     return HTMLResponse(content="<script>alert('User registered successfully!'); window.location='/login';</script>")
 
 
