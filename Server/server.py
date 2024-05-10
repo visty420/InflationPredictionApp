@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession 
 from passlib.context import CryptContext
 from .crud import pwd_context
+import re
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="Frontend"), name="static")
@@ -18,6 +19,11 @@ templates = Jinja2Templates(directory="Frontend/templates")
 SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+
+PASSWORD_REGEX = r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -35,12 +41,30 @@ def get_register(request: Request):
 
 @app.post("/register")
 async def register_user(request: Request, username: str = Form(...), password: str = Form(...), email: str = Form(...), db: AsyncSession = Depends(models.get_db)):
+    print(f"Received username: {username}, email: {email}, password: {password}")  # Debug output
+    
+    # Validate email
+    if not re.match(EMAIL_REGEX, email):
+        print("Email validation failed")  # Debug output
+        return HTMLResponse(content="<script>alert('Invalid email format'); window.location='/register';</script>")
+    
+    # Validate password
+    if not re.match(PASSWORD_REGEX, password):
+        print("Password validation failed")  # Debug output
+        return HTMLResponse(content="<script>alert('Password must contain at least 8 characters, including an uppercase letter, a symbol, and a digit'); window.location='/register';</script>")
+
+    # Proceed with user creation if validations pass
     user_data = schemas.UserCreate(username=username, email=email, password=password)
     new_user = await crud.create_user(db, user_data)
+    print("User created successfully")  # Debug output
     return HTMLResponse(content="<script>alert('User registered successfully!'); window.location='/login';</script>")
+
+
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
+
+
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
