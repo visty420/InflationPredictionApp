@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Request, Form, HTTPException, Depends, status
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -30,6 +31,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 @app.get("/")
 def main_page(request: Request):
     return templates.TemplateResponse("mainpage.html", {"request": request})
+
+@app.get("/factors")
+def macroeconomicdata_page(request : Request):
+    return templates.TemplateResponse("macroeconomic_data.html", {"request" : request})
 
 @app.get("/login")
 def login_page(request: Request):
@@ -87,3 +92,23 @@ async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequ
     response = HTMLResponse(content=response_content)
     response.set_cookie(key="access_token", value=access_token, httponly=True)
     return response
+
+@app.post("/insert_data")
+async def insert_data(date: str = Form(...), cpi: str = Form(...), ppi: str = Form(...),
+                      pce: str = Form(...), fedfunds: str = Form(...), unrate: str = Form(...),
+                      gdp: str = Form(...), m2sl: str = Form(...), umcsent: str = Form(...),
+                      wagegrowth: str = Form(...), inflrate: str = Form(...)):
+    data = [date, cpi, ppi, pce, fedfunds, unrate, gdp, m2sl, umcsent, wagegrowth, inflrate]
+    try:
+        with open('./Backend/Data/complete_data.csv', 'a', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(data)
+        return HTMLResponse(content="<script>alert('Data inserted successfully!'); window.location.href='/factors';</script>")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"An error occurred: {e}")
+    
+@app.get("/view_data")
+async def view_data():
+    import pandas as pd
+    df = pd.read_csv("./Backend/Data/complete_data.csv")
+    return HTMLResponse(content=df.to_html(classes="data", border=0))
