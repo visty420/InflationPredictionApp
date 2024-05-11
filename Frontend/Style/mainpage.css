@@ -18,14 +18,47 @@ body, html {
 header {
     background-color: #003366;
     color: #ffffff;
-    padding: 30px 0; 
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    position: relative; 
+}
+
+.header-title {
+    flex-grow: 1;
     text-align: center;
-    font-size: 28px; 
+    font-size: 28px;
     font-weight: bold;
+    position: relative;
+    right:-75px;
+
+}
+
+.auth-section {
+    display: flex;
+    justify-content: flex-end;
+    position: relative; 
+    z-index: 2; 
+}
+
+.auth-section a {
+    color: #ffffff;
+    background-color: #007BFF;
+    padding: 8px 16px;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
+    margin-left: 10px; 
+    transition: background-color 0.3s;
+}
+
+.auth-section a:hover {
+    background-color: #0056b3;
 }
 
 nav {
-    background: #46516e; 
+    background: #46516e;
     padding: 15px 0;
     display: flex;
     justify-content: center;
@@ -36,11 +69,11 @@ nav a {
     padding: 10px 20px;
     text-decoration: none;
     font-size: 18px;
-    transition: background-color 0.3s; 
+    transition: background-color 0.3s;
 }
 
 nav a:hover {
-    background-color: #354059; 
+    background-color: #354059;
 }
 
 footer {
@@ -56,26 +89,16 @@ footer {
 }
 
 h1 {
-    font-size: 32px; 
-    margin-bottom: 20px; 
-}
-
-.intro {
-    font-size: 18px; 
-    margin-bottom: 30px; 
-}
-
-.feature {
-    margin-bottom: 40px; 
+    font-size: 32px;
+    margin-bottom: 20px;
 }
 
 h2 {
-    font-size: 24px; 
-    margin-bottom: 10px; 
+    font-size: 24px;
+    margin-bottom: 10px;
 }
 
 p {
-    font-size: 16px; 
-    line-height: 1.6; 
+    font-size: 16px;
+    line-height: 1.6;
 }
-

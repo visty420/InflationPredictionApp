@@ -9,37 +9,38 @@ body, html {
 header {
     background-color: #003366;
     color: #ffffff;
-    padding: 20px 0;
+    padding: 30px 0;
     text-align: center;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
 }
 
 nav {
-    background: #707981;
-    padding: 10px 0;
+    background: #46516e;
+    padding: 15px 0;
     display: flex;
     justify-content: center;
 }
 
 nav a {
-    color: white;
-    padding: 10px 15px;
+    color: #ffffff;
+    padding: 10px 20px;
     text-decoration: none;
     font-size: 18px;
+    transition: background-color 0.3s;
 }
 
 nav a:hover {
-    background-color: #2b3744;
+    background-color: #354059;
 }
 
 .container {
     width: 90%;
     max-width: 360px;
-    margin: 50px auto;
+    margin: 40px auto;
     padding: 30px;
     background-color: #fff;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
 
@@ -53,7 +54,6 @@ nav a:hover {
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
-    transition: border 0.3s;
 }
 
 .form-input:focus {
@@ -79,10 +79,10 @@ nav a:hover {
 
 footer {
     text-align: center;
-    padding: 10px 0;
+    padding: 30px 0;
     background-color: #003366;
     color: white;
+    width: 100%;
     position: fixed;
     bottom: 0;
-    width: 100%;
 }
