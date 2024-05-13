@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 class UserBase(BaseModel):
@@ -15,4 +16,12 @@ class User(BaseModel):
     email: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+class PredictionRequest(BaseModel):
+    model_name: str
+    features: List[float]
+
+class ARIMAPredictionRequest(BaseModel):
+    months: int  

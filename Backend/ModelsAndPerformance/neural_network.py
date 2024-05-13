@@ -11,20 +11,22 @@ import optuna
 
 df = pd.read_csv('./Backend/Data/economic_data.csv')  
 
-# Define features and target
 features = df[['CPIAUCSL', 'PPIACO', 'PCE']].values
 target = df['INFLRATE'].values
 
-# Normalize the features
 scaler = StandardScaler()
 X_normalized = scaler.fit_transform(features)
 
-# Split the dataset
+scaler_path = './Backend/SavedModels/3in_model_scaler.gz'
+joblib.dump(scaler, scaler_path)
+print(f"Scaler saved to {scaler_path}")
+
+
 X_train, X_test, y_train, y_test = train_test_split(X_normalized, target, test_size=0.2, random_state=42)
 
-class InflationPredictor(nn.Module):
+class SimpleInflationPredictor(nn.Module):
     def __init__(self, input_size, num_layers, num_neurons):
-        super(InflationPredictor, self).__init__()
+        super(SimpleInflationPredictor, self).__init__()
         layers = [nn.Linear(input_size, num_neurons), nn.ReLU()]
         for _ in range(1, num_layers):
             layers += [nn.Linear(num_neurons, num_neurons), nn.ReLU()]
@@ -53,7 +55,7 @@ def optimize_model(trial):
     num_neurons = trial.suggest_int('num_neurons', 10, 100)
     
     
-    model = InflationPredictor(input_size=3, num_layers=num_layers, num_neurons=num_neurons)
+    model = SimpleInflationPredictor(input_size=3, num_layers=num_layers, num_neurons=num_neurons)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
     
@@ -83,7 +85,7 @@ best_params ={
     'num_layers':2,
     'num_neurons':56
 }
-model = InflationPredictor(input_size=3, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'])
+model = SimpleInflationPredictor(input_size=3, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'])
 optimizer = optim.Adam(model.parameters(), lr=best_params['lr'])
 
 epochs = 400
@@ -99,6 +101,10 @@ for epoch in range(epochs):
         optimizer.step()
     print(f'Epoch {epoch+1}: Loss = {loss.item()}')
 
+model_path = './Backend/SavedModels/3in_model.pth'
+torch.save(model.state_dict(), model_path)
+print(f"Model state dictionary saved to {model_path}")
+
 current_month_features = np.array([309.685, 250.698, 19091])
 current_month_features_normalized = scaler.transform([current_month_features])
 current_month_tensor = torch.tensor(current_month_features_normalized, dtype=torch.float)
@@ -106,8 +112,5 @@ current_month_tensor = torch.tensor(current_month_features_normalized, dtype=tor
 model.eval()  
 with torch.no_grad():
     predicted_inflation_rate = model(current_month_tensor).item()
-
-torch.save(model, './Backend/SavedModels/3in_mlp.pth')
-joblib.dump(scaler, './Backend/SavedModels/3in_mlp_scaler.gz')
 
 print(f"Predicted Inflation Rate: {predicted_inflation_rate}%")

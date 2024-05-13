@@ -25,6 +25,9 @@ target = df['INFLRATE'].values.reshape(-1, 1)
 scaler = StandardScaler()
 X_normalized = scaler.fit_transform(features)
 
+scaler_path = './Backend/SavedModels/lstm_scaler.gz'
+joblib.dump(scaler, scaler_path)
+print(f"Scaler saved to {scaler_path}")
 
 sequence_length = 12  
 X_seq, y_seq = create_sequences(X_normalized, target.flatten(), sequence_length)
@@ -75,8 +78,9 @@ for epoch in range(num_epochs):
         optimizer.step()
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
 
-torch.save(model.state_dict(), './Backend/SavedModels/lstm_model.pth')
-joblib.dump(scaler, './Backend/SavedModels/lstm_scaler.gz')
+model_path = './Backend/SavedModels/lstm_model.pth'
+torch.save(model.state_dict(), model_path)
+print(f"Model state dictionary saved to {model_path}")
 
 model.eval()
 predictions, actuals = [], []

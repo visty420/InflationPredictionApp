@@ -1,29 +1,34 @@
 document.addEventListener('DOMContentLoaded', function() {
-    updateInputFields();  // Initial call to set up form fields based on default selected model
+    updateInputFields();  // Call initial to set up form fields based on default selected model
 
     document.getElementById('predictionForm').addEventListener('submit', function(event) {
         event.preventDefault();
-        const formData = new FormData(this);
-        const model = document.getElementById('modelSelect').value;
-        const data = { model: model, features: [], steps: 1 };
 
-        // Collect all input values
-        formData.forEach((value, key) => {
-            if (key !== 'model') {
-                if (model === 'ARIMA') {
-                    data.steps = parseInt(value);
-                } else {
-                    data.features.push(parseFloat(value));
-                }
-            }
-        });
+        const modelSelect = document.getElementById('modelSelect');
+        const model = modelSelect.value;
 
-        // Make AJAX call to server
-        fetch('/predict/', {
+        let data, endpoint;
+        const inputFields = document.getElementById('inputFields').getElementsByTagName('input');
+
+        if (model === "ARIMA") {
+            const months = parseInt(inputFields[0].value);
+            data = {
+                months: months  
+            };
+            endpoint = '/predict/arima/';  
+        } else {
+            const features = Array.from(inputFields).map(input => parseFloat(input.value));
+            data = {
+                model_name: model,
+                features: features
+            };
+            endpoint = '/predict/';  // Endpoint general pentru alte modele
+        }
+
+        fetch(endpoint, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer yourAuthToken' 
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
         })
@@ -31,38 +36,43 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             const resultDiv = document.getElementById('result');
             resultDiv.style.display = 'block';
-            resultDiv.innerText = 'Predicted Inflation: ' + data.predicted_inflation;
+            resultDiv.innerHTML = '';  // Clear previous contents
+
+            if (Array.isArray(data.predicted_inflation)) {
+                // Special treatment for ARIMA, where predicted_inflation is an array
+                data.predicted_inflation.forEach((inflation, index) => {
+                    const monthResult = document.createElement('div');
+                    monthResult.innerText = `Month ${index + 1}: Predicted Inflation: ${inflation}`;
+                    resultDiv.appendChild(monthResult);
+                });
+            } else {
+                // Treatment for other models
+                resultDiv.innerText = 'Predicted Inflation: ' + data.predicted_inflation;
+            }
         })
         .catch(error => {
             console.error('Error:', error);
+            alert('Failed to predict inflation. Check the console for more information.');
         });
     });
 });
 
 function updateInputFields() {
-    const model = document.getElementById('modelSelect').value;
+    const modelSelect = document.getElementById('modelSelect');
+    const model = modelSelect.value;
     const inputFields = document.getElementById('inputFields');
     inputFields.innerHTML = '';
 
-    if (model === 'ARIMA') {
-        inputFields.innerHTML = '<input type="number" name="steps" placeholder="Months to predict" required>';
-    } else {
-        const placeholders = [
-            'Consumer Price Index', 
-            'Producer Price Index', 
-            'Personal Consumption Expenditures',
-            'Federal Funds Rate', 
-            'Unemployment Rate', 
-            'Gross Domestic Product', 
-            'Money Supply M2', 
-            'Consumer Sentiment', 
-            'Wage Growth' 
-        ];
+    const placeholders = {
+        'ARIMA': ['Months to predict'],
+        'LSTM': ['Consumer Price Index', 'Producer Price Index', 'Personal Consumption Expenditures', 'Federal Funds Rate', 'Unemployment Rate', 'Gross Domestic Product', 'Money Supply M2', 'Consumer Sentiment', 'Wage Growth'],
+        'NN_3': ['Consumer Price Index', 'Producer Price Index', 'Personal Consumption Expenditures'],
+        'NN_9': ['Consumer Price Index', 'Producer Price Index', 'Personal Consumption Expenditures', 'Federal Funds Rate', 'Unemployment Rate', 'Gross Domestic Product', 'Money Supply M2', 'Consumer Sentiment', 'Wage Growth'],
+        'RNN': ['Consumer Price Index', 'Producer Price Index', 'Personal Consumption Expenditures', 'Federal Funds Rate', 'Unemployment Rate', 'Gross Domestic Product', 'Money Supply M2', 'Consumer Sentiment', 'Wage Growth']
+    };
 
-        const inputCount = model === 'NN_3' ? 3 : 9;
-        for (let i = 0; i < inputCount; i++) {
-            inputFields.innerHTML += `<input type="text" name="feature${i + 1}" placeholder="${placeholders[i]}" required>`;
-        }
+    const inputCount = placeholders[model].length;
+    for (let i = 0; i < inputCount; i++) {
+        inputFields.innerHTML += `<input type="text" name="feature${i + 1}" placeholder="${placeholders[model][i]}" required>`;
     }
 }
-

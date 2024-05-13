@@ -18,6 +18,10 @@ target = df['INFLRATE']
 scaler = StandardScaler()
 features_scaled = scaler.fit_transform(features)
 
+scaler_path = './Backend/SavedModels/rnn_scaler.gz'
+joblib.dump(scaler, scaler_path)
+print(f"Scaler saved to {scaler_path}")
+
 window_size = 12
 X, y = [], []
 for i in range(len(features_scaled) - window_size):
@@ -66,15 +70,20 @@ def train_model(model, train_loader, criterion, optimizer, num_epochs=100):
 num_epochs = 400
 train_model(model, train_loader, criterion, optimizer, num_epochs)
 
+model_path = './Backend/SavedModels/rnn_model.pth'
+torch.save(model.state_dict(), model_path)
+print(f"Model state dictionary saved to {model_path}")
+
 model.eval()
 with torch.no_grad():
     all_predictions = [model(inputs).view(-1).cpu().numpy() for inputs, targets in test_loader]
     all_targets = [targets.view(-1).cpu().numpy() for inputs, targets in test_loader]
 
-torch.save(model, './Backend/SavedModels/rnn_model.pth')
-joblib.dump(scaler, './Backend/SavedModels/rnn_scaler.gz')
 
 all_predictions = np.concatenate(all_predictions)
 all_targets = np.concatenate(all_targets)
 r2 = r2_score(all_targets, all_predictions)
 print(f"R-squared Score: {r2 * 100:.2f}%")
+
+
+torch.save(model, './Backend/SavedModels/rnn_model.pth')

@@ -14,32 +14,19 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession 
 from passlib.context import CryptContext
 from .crud import pwd_context
+from torch import nn
 import re
+from .schemas import ARIMAPredictionRequest, PredictionRequest
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="Frontend"), name="static")
 templates = Jinja2Templates(directory="Frontend/templates")
-
 SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-
 PASSWORD_REGEX = r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
 EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-
-# # Load models and scalers
-# arima_model = joblib.load('./SavedModels/arima_model.pkl')
-# lstm_model = torch.load('./SavedModels/lstm_model.pth')
-# nn_3_model = torch.load('./SavedModels/3in_mlp.pth')
-# nn_9_model = torch.load('./SavedModels/9in_mlp.pth')
-# rnn_model = torch.load('./SavedModels/rnn.pth')
-
-# # Assume scalers are stored as .gz files
-# nn_3_scaler = joblib.load('./SavedModels/3in_mlp_scaler.gz')
-# nn_9_scaler = joblib.load('./SavedModels/9in_mlp_scaler.gz')
-# lstm_scaler = joblib.load('./SavedModels/lstm_scaler.gz')
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @app.get("/")
@@ -75,12 +62,8 @@ async def register_user(request: Request, username: str = Form(...), password: s
     print("User created successfully")
     return HTMLResponse(content="<script>alert('User registered successfully!'); window.location='/login';</script>")
 
-
-
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
-
-
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
@@ -126,61 +109,102 @@ async def view_data():
     df = pd.read_csv("./Backend/Data/complete_data.csv")
     return HTMLResponse(content=df.to_html(classes="data", border=0))
 
-# def predict_with_arima(steps: int):
-#     # Assuming steps is a parameter used to predict future values
-#     prediction = arima_model.forecast(steps=steps)
-#     return prediction.tolist()
 
-# def predict_with_lstm(features):
-#     features = np.array([features]).astype(float)
-#     features = lstm_scaler.transform(features)
-#     features_tensor = torch.tensor(features, dtype=torch.float32)
-#     lstm_model.eval()
-#     with torch.no_grad():
-#         predicted = lstm_model(features_tensor).item()
-#     return predicted
+arima_model = joblib.load("./Backend/SavedModels/arimamodel.pkl")
 
-# def predict_with_nn_3(features):
-#     features = np.array([features]).astype(float)
-#     features = nn_3_scaler.transform(features)
-#     features_tensor = torch.tensor(features, dtype=torch.float32)
-#     nn_3_model.eval()
-#     with torch.no_grad():
-#         predicted = nn_3_model(features_tensor).item()
-#     return predicted
+class LSTMModel(nn.Module):
+    def __init__(self, input_dim, hidden_dim, num_layers, output_dim, dropout_rate=0.0):
+        super(LSTMModel, self).__init__()
+        self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True, dropout=dropout_rate)
+        self.fc = nn.Linear(hidden_dim, output_dim)
 
-# def predict_with_nn_9(features):
-#     features = np.array([features]).astype(float)
-#     features = nn_9_scaler.transform(features)
-#     features_tensor = torch.tensor(features, dtype=torch.float32)
-#     nn_9_model.eval()
-#     with torch.no_grad():
-#         predicted = nn_9_model(features_tensor).item()
-#     return predicted
+    def forward(self, x):
+        self.lstm.flatten_parameters()
+        out, (hn, cn) = self.lstm(x)
+        out = self.fc(out[:, -1, :]) 
+        return out
 
-# def predict_with_rnn(features):
-#     features = np.array([features]).astype(float)
-#     features = nn_9_scaler.transform(features)  # Assuming RNN uses the same scaler as NN_9
-#     features_tensor = torch.tensor(features, dtype=torch.float32)
-#     rnn_model.eval()
-#     with torch.no_grad():
-#         predicted = rnn_model(features_tensor).item()
-#     return predicted
+lstm_scaler = joblib.load("./Backend/SavedModels/lstmscaler.gz")
+lstm_model = LSTMModel(input_dim=9, hidden_dim=31, num_layers=2, output_dim=1)
+lstm_model.load_state_dict(torch.load("./Backend/SavedModels/lstmmodel.pth"))
+lstm_model.eval()
 
-# @router.post("/predict/")
-# async def make_prediction(data: dict, model_type: str, username: str = Depends(oauth2_scheme)):
-#     features = data.get('features', [])
-#     steps = int(data.get('steps', 1))  
-#     if model_type == 'ARIMA':
-#         result = predict_with_arima(steps)
-#     elif model_type == 'LSTM':
-#         result = predict_with_lstm(features)
-#     elif model_type == 'NN_3':
-#         result = predict_with_nn_3(features[:3])  
-#     elif model_type == 'NN_9':
-#         result = predict_with_nn_9(features)
-#     elif model_type == 'RNN':
-#         result = predict_with_rnn(features)
-#     else:
-#         raise HTTPException(status_code=400, detail="Model type not supported")
-#     return {"predicted_inflation": result}
+class SimpleInflationPredictor(torch.nn.Module):
+    def __init__(self, input_size, num_layers, num_neurons):
+        super(SimpleInflationPredictor, self).__init__()
+        layers = [torch.nn.Linear(input_size, num_neurons), torch.nn.ReLU()]
+        for _ in range(1, num_layers):
+            layers += [torch.nn.Linear(num_neurons, num_neurons), torch.nn.ReLU()]
+        layers += [torch.nn.Linear(num_neurons, 1)]
+        self.network = torch.nn.Sequential(*layers)
+        
+    def forward(self, x):
+        return self.network(x)
+
+nn_3inputs_scaler = joblib.load("./Backend/SavedModels/3inmodelscaler.gz")
+nn_3inputs_model = SimpleInflationPredictor(input_size=3, num_layers=2, num_neurons=56)
+nn_3inputs_model.load_state_dict(torch.load("./Backend/SavedModels/3inmodel.pth"))
+nn_3inputs_model.eval()
+
+class InflationPredictor(torch.nn.Module):
+    def __init__(self, input_size, num_layers, num_neurons):
+        super(InflationPredictor, self).__init__()
+        layers = [torch.nn.Linear(input_size, num_neurons), torch.nn.ReLU()]
+        for _ in range(1, num_layers):
+            layers += [torch.nn.Linear(num_neurons, num_neurons), torch.nn.ReLU()]
+        layers += [torch.nn.Linear(num_neurons, 1)]
+        self.network = torch.nn.Sequential(*layers)
+        
+    def forward(self, x):
+        return self.network(x)
+
+nn_9inputs_scaler = joblib.load("./Backend/SavedModels/9inmodelscaler.gz")
+nn_9inputs_model = InflationPredictor(input_size=9, num_layers=3, num_neurons=98)
+nn_9inputs_model.load_state_dict(torch.load("./Backend/SavedModels/9inmodel.pth"))
+nn_9inputs_model.eval()
+
+def predict_arima(features, months):
+    arima_model = joblib.load('./Backend/SavedModels/arimamodel.pkl')
+    prediction = arima_model.forecast(steps=months)
+    formatted_prediction = f"{prediction.iloc[-1]:.2f}%"  # Formatăm ultima valoare prezisă
+    return formatted_prediction
+def predict_lstm(features):
+    features_scaled = lstm_scaler.transform(features)
+    features_tensor = torch.tensor(features_scaled, dtype=torch.float32).unsqueeze(0)
+    prediction = lstm_model(features_tensor).item()
+    formatted_prediction = f"{prediction:.2f}%"
+    return formatted_prediction
+
+def predict_nn_3(features):
+    features_scaled = nn_3inputs_scaler.transform(features)
+    prediction = nn_3inputs_model(torch.tensor(features_scaled, dtype=torch.float32)).item()
+    formatted_prediction = f"{prediction:.2f}%"
+    return formatted_prediction
+
+def predict_nn_9(features):
+    features_scaled = nn_9inputs_scaler.transform(features)
+    prediction = nn_9inputs_model(torch.tensor(features_scaled, dtype=torch.float32)).item()
+    formatted_prediction = f"{prediction:.2f}%"
+    return formatted_prediction
+
+@app.post("/predict/")
+async def predict_inflation(data: schemas.PredictionRequest):
+    model_name = data.model_name
+    features = np.array(data.features).reshape(1, -1)
+    if model_name == "LSTM":
+        prediction = predict_lstm(features)
+    elif model_name == "NN_3":
+        prediction = predict_nn_3(features)
+    elif model_name == "NN_9":
+        prediction = predict_nn_9(features)
+    else:
+        raise HTTPException(status_code=400, detail="Model not supported")
+
+    return {"predicted_inflation": prediction}
+
+@app.post("/predict/arima/")
+async def predict_arima(request: ARIMAPredictionRequest):
+    arima_model = joblib.load('./Backend/SavedModels/arimamodel.pkl')
+    predictions = arima_model.forecast(steps=request.months)
+    formatted_predictions = [f"{pred:.2f}%" for pred in predictions]
+    return {"predicted_inflation": formatted_predictions}

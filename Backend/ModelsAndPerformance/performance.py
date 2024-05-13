@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import r2_score
-from neural_network import InflationPredictor
+from neural_network import SimpleInflationPredictor
 import pandas as pd
 import numpy as np
 
@@ -39,7 +39,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(X_normalized, target)):
     train_loader = create_dataloader(X_normalized[train_idx], target[train_idx])
     val_loader = create_dataloader(X_normalized[val_idx], target[val_idx])
 
-    model = InflationPredictor(input_size=3, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'])
+    model = SimpleInflationPredictor(input_size=3, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'])
     optimizer = optim.Adam(model.parameters(), lr=best_params['lr'])
     criterion = nn.MSELoss()
 

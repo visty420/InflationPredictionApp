@@ -20,6 +20,9 @@ target = df['INFLRATE'].values
 scaler = StandardScaler()
 X_normalized = scaler.fit_transform(features)
 
+scaler_path = './Backend/SavedModels/9in_model_scaler.gz'
+joblib.dump(scaler, scaler_path)
+print(f"Scaler saved to {scaler_path}")
 
 X_train, X_test, y_train, y_test = train_test_split(X_normalized, target, test_size=0.2, random_state=42)
 
@@ -45,7 +48,7 @@ class InflationPredictor(nn.Module):
 
 def create_dataloader(X, y, batch_size=64):
     tensor_X = torch.tensor(X, dtype=torch.float32)
-    tensor_y = torch.tensor(y, dtype=torch.float32).view(-1, 1)  # Adjust shape for regression
+    tensor_y = torch.tensor(y, dtype=torch.float32).view(-1, 1)  
     dataset = TensorDataset(tensor_X, tensor_y)
     return DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
@@ -68,9 +71,9 @@ for epoch in range(best_params['epochs']):
         optimizer.step()
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
 
-
-torch.save(model.state_dict(), './Backend/SavedModels/9in_mlp.pth')
-joblib.dump(scaler, './Backend/SavedModels/9in_mlp_scaler.gz')
+model_path = './Backend/SavedModels/9in_model.pth'
+torch.save(model.state_dict(), model_path)
+print(f"Model saved to {model_path}")
 
 new_features = np.array([[29.11,31.7,318.2,4,5,524.2403333,294.1,95.05,3.918944099]])  
 

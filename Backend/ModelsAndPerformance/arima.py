@@ -1,3 +1,4 @@
+import joblib
 import pandas as pd
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
@@ -32,8 +33,7 @@ model = ARIMA(ts, order=(p, d, q))
 results = model.fit()
 
 model_filepath = './Backend/SavedModels/arima_model.pkl'
-results.save(model_filepath)
-
+joblib.dump(results, model_filepath)
 
 forecast = results.forecast(steps=5)
 print(forecast)
