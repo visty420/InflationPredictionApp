@@ -31,8 +31,9 @@ p, d, q = 1, 1, 1
 model = ARIMA(ts, order=(p, d, q))
 results = model.fit()
 
-model_filepath = './Backend/SavedModels/inflation_arima_model.pkl'
+model_filepath = './Backend/SavedModels/arima_model.pkl'
 results.save(model_filepath)
+
 
 forecast = results.forecast(steps=5)
 print(forecast)

@@ -75,7 +75,7 @@ for epoch in range(num_epochs):
         optimizer.step()
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
 
-torch.save(model.state_dict(), './Backend/SavedModels/lstm_model_state_dict.pth')
+torch.save(model.state_dict(), './Backend/SavedModels/lstm_model.pth')
 joblib.dump(scaler, './Backend/SavedModels/lstm_scaler.gz')
 
 model.eval()

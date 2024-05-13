@@ -69,8 +69,8 @@ for epoch in range(best_params['epochs']):
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
 
 
-torch.save(model.state_dict(), './Backend/SavedModels/nlp')
-joblib.dump(scaler, './Backend/SavedModels/nlp_scaler.gz')
+torch.save(model.state_dict(), './Backend/SavedModels/9in_mlp.pth')
+joblib.dump(scaler, './Backend/SavedModels/9in_mlp_scaler.gz')
 
 new_features = np.array([[29.11,31.7,318.2,4,5,524.2403333,294.1,95.05,3.918944099]])  
 

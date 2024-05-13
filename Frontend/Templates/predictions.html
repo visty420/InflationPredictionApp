@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Inflation</title>
+    <link rel="stylesheet" href="/static/Style/predictions.css">
+</head>
+<body>
+    <header>
+        <div class="header-title">Inflation Prediction App</div>
+        <nav>
+            <a href="/">MainPage</a>
+            <a href="/factors">Macroeconomic Data</a>
+            <a href="/predictions">Predictions</a>
+            <a href="/models">Model comparison</a>
+        </nav>
+    </header>
+    <main>
+        <h1>Predict Inflation Rates</h1>
+        <form id="predictionForm">
+            <div id="inputFields"></div>
+            <select name="model" id="modelSelect" onchange="updateInputFields()">
+                <option value="ARIMA">ARIMA</option>
+                <option value="LSTM">LSTM (9 inputs)</option>
+                <option value="NN_3">Neural Network (3 inputs)</option>
+                <option value="NN_9">Neural Network (9 inputs)</option>
+                <option value="RNN">Recurrent Neural Network (9 inputs)</option>
+            </select>
+            <button type="submit">Predict</button>
+        </form>
+        <div id="result"></div>
+    </main>
+    <script src="/static/Scripts/predictions.js"></script>
+</body>
+</html>

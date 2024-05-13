@@ -71,7 +71,7 @@ with torch.no_grad():
     all_predictions = [model(inputs).view(-1).cpu().numpy() for inputs, targets in test_loader]
     all_targets = [targets.view(-1).cpu().numpy() for inputs, targets in test_loader]
 
-torch.save(model, './Backend/SavedModels/rnn.pth')
+torch.save(model, './Backend/SavedModels/rnn_model.pth')
 joblib.dump(scaler, './Backend/SavedModels/rnn_scaler.gz')
 
 all_predictions = np.concatenate(all_predictions)
