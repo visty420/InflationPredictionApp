@@ -11,22 +11,22 @@ header {
     color: white;
     padding: 10px 20px;
     display: flex;
-    justify-content: center; /* Ensures title is centered */
-    align-items: center; /* Vertically centers the items in the header */
+    flex-direction: column;
+    align-items: center;
 }
 
 .header-title {
     text-align: center;
-    width: 100%; /* Forces the title to occupy full header width */
+    width: 100%; 
 }
 
 nav {
     background: #46516e;
-    margin-top: 0; /* Removes any top margin */
+    margin-top: 10px; 
     padding: 10px 0;
     display: flex;
     justify-content: center;
-    width: 100%; /* Ensures nav bar takes full width */
+    width: 100%; 
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -50,6 +50,25 @@ main {
     border-radius: 8px;
 }
 
+h1 {
+    color: #003366;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input, select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+}
+
 button {
     background-color: #007BFF;
     color: white;
@@ -65,8 +84,9 @@ button:hover {
     background-color: #0056b3;
 }
 
-/* Ensures no extra space at the top of the body, forcing header to the top */
-body {
-    margin-top: 0;
-    padding-top: 0;
+#result {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-radius: 5px;
 }
