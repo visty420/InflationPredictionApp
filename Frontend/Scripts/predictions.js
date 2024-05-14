@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 model_name: model,
                 features: features
             };
-            endpoint = '/predict/';  // Endpoint general pentru alte modele
+            endpoint = '/predict/'; 
         }
 
         fetch(endpoint, {

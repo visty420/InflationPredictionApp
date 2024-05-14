@@ -1,14 +1,9 @@
-import csv
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Request, Form, HTTPException, Depends, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import joblib
-import jwt
-import numpy as np
-import torch
 from . import crud, models, schemas
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession 
@@ -16,8 +11,12 @@ from passlib.context import CryptContext
 from .crud import pwd_context
 from torch import nn
 import re
-from .schemas import ARIMAPredictionRequest, PredictionRequest
-
+from .schemas import ARIMAPredictionRequest, ComparisonRequest, PredictionRequest
+import joblib
+import jwt
+import numpy as np
+import torch
+import csv
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="Frontend"), name="static")
@@ -28,6 +27,36 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 PASSWORD_REGEX = r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
 EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+class InflationRNN(nn.Module):
+    def __init__(self, input_size, hidden_size, num_layers, output_size):
+        super(InflationRNN, self).__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_size, output_size)
+
+    def forward(self, x):
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
+        out, _ = self.rnn(x, h0)
+        out = self.fc(out[:, -1, :])  
+        return out
+
+def custom_load(path):
+    return torch.load(path, map_location=lambda storage, loc: storage)
+
+rnn_scaler_path = "./Backend/SavedModels/rnn_scaler.gz"
+rnn_model_path = "./Backend/SavedModels/rnn_model.pth"
+
+try:
+    rnn_scaler = joblib.load(rnn_scaler_path)
+    rnn_model = InflationRNN(input_size=9, hidden_size=50, num_layers=2, output_size=1)
+    rnn_model.load_state_dict(custom_load(rnn_model_path))
+    rnn_model.eval()
+    print("RNN model and scaler loaded successfully.")
+except Exception as e:
+    print(f"Failed to load RNN model or scaler: {e}")
 
 @app.get("/")
 def main_page(request: Request):
@@ -48,6 +77,10 @@ def get_register(request: Request):
 @app.get("/predictions")
 def predictions_page(request : Request):
     return templates.TemplateResponse("predictions.html", {"request" : request})
+
+@app.get("/models")
+def comparison_page(request : Request):
+    return templates.TemplateResponse("comparison.html", {"request": request})
 
 @app.post("/register")
 async def register_user(request: Request, username: str = Form(...), password: str = Form(...), email: str = Form(...), db: AsyncSession = Depends(models.get_db)):
@@ -111,7 +144,6 @@ async def view_data():
 
 
 arima_model = joblib.load("./Backend/SavedModels/arimamodel.pkl")
-
 class LSTMModel(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_layers, output_dim, dropout_rate=0.0):
         super(LSTMModel, self).__init__()
@@ -163,11 +195,13 @@ nn_9inputs_model = InflationPredictor(input_size=9, num_layers=3, num_neurons=98
 nn_9inputs_model.load_state_dict(torch.load("./Backend/SavedModels/9inmodel.pth"))
 nn_9inputs_model.eval()
 
+
 def predict_arima(features, months):
     arima_model = joblib.load('./Backend/SavedModels/arimamodel.pkl')
     prediction = arima_model.forecast(steps=months)
-    formatted_prediction = f"{prediction.iloc[-1]:.2f}%"  # Formatăm ultima valoare prezisă
+    formatted_prediction = f"{prediction.iloc[-1]:.2f}%"  
     return formatted_prediction
+
 def predict_lstm(features):
     features_scaled = lstm_scaler.transform(features)
     features_tensor = torch.tensor(features_scaled, dtype=torch.float32).unsqueeze(0)
@@ -187,6 +221,14 @@ def predict_nn_9(features):
     formatted_prediction = f"{prediction:.2f}%"
     return formatted_prediction
 
+def predict_rnn(features):
+    features_scaled = rnn_scaler.transform(features)
+    features_tensor = torch.tensor(features_scaled, dtype=torch.float32).unsqueeze(0)
+    with torch.no_grad():
+        prediction = rnn_model(features_tensor).item()
+    formatted_prediction = f"{prediction:.2f}%"
+    return formatted_prediction
+
 @app.post("/predict/")
 async def predict_inflation(data: schemas.PredictionRequest):
     model_name = data.model_name
@@ -197,6 +239,8 @@ async def predict_inflation(data: schemas.PredictionRequest):
         prediction = predict_nn_3(features)
     elif model_name == "NN_9":
         prediction = predict_nn_9(features)
+    elif model_name =="RNN":
+        prediction = predict_rnn(features)
     else:
         raise HTTPException(status_code=400, detail="Model not supported")
 
@@ -208,3 +252,21 @@ async def predict_arima(request: ARIMAPredictionRequest):
     predictions = arima_model.forecast(steps=request.months)
     formatted_predictions = [f"{pred:.2f}%" for pred in predictions]
     return {"predicted_inflation": formatted_predictions}
+
+@app.post("/compare_models/")
+async def compare_models(data: ComparisonRequest):
+    features = np.array(data.features).reshape(1, -1)
+    
+    nn3_features = features[:, :3]  # NN (3 inputs) uses only the first 3 features
+    nn9_features = features
+    lstm_features = features
+
+    nn3_prediction = predict_nn_3(nn3_features)
+    nn9_prediction = predict_nn_9(nn9_features)
+    lstm_prediction = predict_lstm(lstm_features)
+
+    return {
+        "nn3_prediction": nn3_prediction,
+        "nn9_prediction": nn9_prediction,
+        "lstm_prediction": lstm_prediction
+    }

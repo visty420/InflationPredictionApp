@@ -25,3 +25,6 @@ class PredictionRequest(BaseModel):
 
 class ARIMAPredictionRequest(BaseModel):
     months: int  
+
+class ComparisonRequest(BaseModel):
+    features: List[float]

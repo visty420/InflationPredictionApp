@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Comparison</title>
+    <link rel="stylesheet" href="/static/Style/comparison.css">
+</head>
+<body>
+    <header>
+        <div class="header-title">Inflation Prediction App</div>
+        <nav>
+            <a href="/">MainPage</a>
+            <a href="/factors">Macroeconomic Data</a>
+            <a href="/predictions">Predictions</a>
+            <a href="/models">Model Comparison</a>
+        </nav>
+    </header>
+    <main>
+        <h1>Compare Model Predictions</h1>
+        <form id="comparisonForm">
+            <div id="inputFields"></div>
+            <button type="submit">Compare</button>
+        </form>
+        <div id="results">
+            <div id="nn3Result" class="result"></div>
+            <div id="nn9Result" class="result"></div>
+            <div id="lstmResult" class="result"></div>
+        </div>
+        <canvas id="plot"></canvas>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/Scripts/comparison.js"></script>
+</body>
+</html>
