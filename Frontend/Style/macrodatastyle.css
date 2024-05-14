@@ -1,22 +1,33 @@
-/* Base styling */
 body, html {
     margin: 0;
     padding: 0;
-    font-family: 'Arial', sans-serif;
+    font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     color: #333;
 }
 
-h1 {
-    text-align: center;
+header {
+    background-color: #003366;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* Navigation bar */
+.header-title {
+    text-align: center;
+    width: 100%; 
+}
+
 nav {
     background: #46516e;
-    padding: 15px 0;
+    margin-top: 0; 
+    padding: 10px 0;
     display: flex;
     justify-content: center;
+    width: 100%; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 nav a {
@@ -24,77 +35,73 @@ nav a {
     padding: 10px 20px;
     text-decoration: none;
     font-size: 18px;
-    transition: background-color 0.3s;
 }
 
 nav a:hover {
     background-color: #354059;
 }
 
-/* Container for form and data */
-.container {
-    width: 80%;
-    max-width: 960px;
-    margin: 40px auto;
+main {
+    margin: 20px auto;
+    max-width: 800px;
     padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     border-radius: 8px;
 }
 
-/* Styling form elements */
-.form-group {
-    margin-bottom: 20px;
+h1, h2 {
+    color: #003366;
+    text-align: center;
 }
 
-.form-label, label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
 }
 
 .description {
-    font-style: italic;
-    color: #555;
+    font-size: 14px;
+    color: #666;
     margin-top: 5px;
-    margin-bottom: 20px;
-}
-
-.form-input, input[type="text"], button {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.form-input:focus, input[type="text"]:focus {
-    border-color: #0056b3;
-    box-shadow: 0 0 8px rgba(0, 86, 179, 0.2);
 }
 
 button {
-    background-color: #003366;
+    background-color: #007BFF;
     color: white;
+    padding: 10px;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    margin-top: 10px; /* Added space above the button */
-    transition: background-color 0.3s;
+    width: 100%;
 }
 
 button:hover {
     background-color: #0056b3;
 }
 
-footer {
-    text-align: center;
-    padding: 10px 0;
-    background-color: #003366;
-    color: #ffffff;
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
+.container > div {
+    display: flex;
+    justify-content: center;
+}

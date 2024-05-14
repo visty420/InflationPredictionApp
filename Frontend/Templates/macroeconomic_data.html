@@ -7,75 +7,80 @@
     <link rel="stylesheet" href="/static/Style/macrodatastyle.css">
 </head>
 <body>
+    <header>
+        <div class="header-title">Inflation Prediction App</div>
+    </header>
     <nav>
         <a href="/">MainPage</a>
         <a href="/factors">Macroeconomic Data</a>
         <a href="/predictions">Predictions</a>
         <a href="/models">Model comparison</a>
     </nav>
-    <h1>Macroeconomic Data</h1>
-    <div class="container">
-        <h2>Insert New Data</h2>
-        <form action="/insert_data" method="post">
-            <div class="form-group">
-                <label for="date">1. Date (MM/DD/YYYY):</label>
-                <input type="text" id="date" name="date" required>
+    <main>
+        <h1>Macroeconomic Data</h1>
+        <div class="container">
+            <h2>Insert New Data</h2>
+            <form action="/insert_data" method="post">
+                <div class="form-group">
+                    <label for="date">1. Date (MM/DD/YYYY):</label>
+                    <input type="text" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="cpi">2. CPIAUCSL (Consumer Price Index):</label>
+                    <input type="text" id="cpi" name="cpi" required>
+                    <p class="description">The CPI measures the average change over time in the prices paid by urban consumers for a market basket of consumer goods and services.</p>
+                </div>
+                <div class="form-group">
+                    <label for="ppi">3. PPIACO (Producer Price Index):</label>
+                    <input type="text" id="ppi" name="ppi" required>
+                    <p class="description">The PPI measures the average change over time in the selling prices received by domestic producers for their output.</p>
+                </div>
+                <div class="form-group">
+                    <label for="pce">4. PCE (Personal Consumption Expenditures):</label>
+                    <input type="text" id="pce" name="pce" required>
+                    <p class="description">The PCE measures the prices that people living in the United States, or those buying on their behalf, pay for goods and services.</p>
+                </div>
+                <div class="form-group">
+                    <label for="fedfunds">5. FEDFUNDS (Federal Funds Rate):</label>
+                    <input type="text" id="fedfunds" name="fedfunds" required>
+                    <p class="description">This is the interest rate at which depository institutions trade federal funds with each other overnight.</p>
+                </div>
+                <div class="form-group">
+                    <label for="unrate">6. UNRATE (Unemployment Rate):</label>
+                    <input type="text" id="unrate" name="unrate" required>
+                    <p class="description">The unemployment rate represents the number of unemployed as a percentage of the labor force.</p>
+                </div>
+                <div class="form-group">
+                    <label for="gdp">7. GDP (Gross Domestic Product):</label>
+                    <input type="text" id="gdp" name="gdp" required>
+                    <p class="description">GDP measures the total economic output of a country.</p>
+                </div>
+                <div class="form-group">
+                    <label for="m2sl">8. M2SL (Money Supply M2):</label>
+                    <input type="text" id="m2sl" name="m2sl" required>
+                    <p class="description">M2 is a measure of the money supply that includes cash, checking deposits, and easily convertible near money.</p>
+                </div>
+                <div class="form-group">
+                    <label for="umcsent">9. UMCSENT (Consumer Sentiment):</label>
+                    <input type="text" id="umcsent" name="umcsent" required>
+                    <p class="description">This index measures how optimistic consumers are about their financial prospects and the state of the economy.</p>
+                </div>
+                <div class="form-group">
+                    <label for="wagegrowth">10. Overall Wage Growth:</label>
+                    <input type="text" id="wagegrowth" name="wagegrowth" required>
+                    <p class="description">Wage growth measures the annual change in wages and salaries of a country's workers.</p>
+                </div>
+                <div class="form-group">
+                    <label for="inflrate">11. INFLRATE (Inflation Rate):</label>
+                    <input type="text" id="inflrate" name="inflrate" required>
+                    <p class="description">The inflation rate measures the annual percentage increase in the general price level of goods and services in an economy.</p>
+                </div>
+                <button type="submit">Insert Data</button>
+            </form>
+            <div>
+                <button onclick="window.location.href='/view_data'">View Data</button>
             </div>
-            <div class="form-group">
-                <label for="cpi">2. CPIAUCSL (Consumer Price Index):</label>
-                <input type="text" id="cpi" name="cpi" required>
-                <p class="description">The CPI measures the average change over time in the prices paid by urban consumers for a market basket of consumer goods and services.</p>
-            </div>
-            <div class="form-group">
-                <label for="ppi">3. PPIACO (Producer Price Index):</label>
-                <input type="text" id="ppi" name="ppi" required>
-                <p class="description">The PPI measures the average change over time in the selling prices received by domestic producers for their output.</p>
-            </div>
-            <div class="form-group">
-                <label for="pce">4. PCE (Personal Consumption Expenditures):</label>
-                <input type="text" id="pce" name="pce" required>
-                <p class="description">The PCE measures the prices that people living in the United States, or those buying on their behalf, pay for goods and services.</p>
-            </div>
-            <div class="form-group">
-                <label for="fedfunds">5. FEDFUNDS (Federal Funds Rate):</label>
-                <input type="text" id="fedfunds" name="fedfunds" required>
-                <p class="description">This is the interest rate at which depository institutions trade federal funds with each other overnight.</p>
-            </div>
-            <div class="form-group">
-                <label for="unrate">6. UNRATE (Unemployment Rate):</label>
-                <input type="text" id="unrate" name="unrate" required>
-                <p class="description">The unemployment rate represents the number of unemployed as a percentage of the labor force.</p>
-            </div>
-            <div class="form-group">
-                <label for="gdp">7. GDP (Gross Domestic Product):</label>
-                <input type="text" id="gdp" name="gdp" required>
-                <p class="description">GDP measures the total economic output of a country.</p>
-            </div>
-            <div class="form-group">
-                <label for="m2sl">8. M2SL (Money Supply M2):</label>
-                <input type="text" id="m2sl" name="m2sl" required>
-                <p class="description">M2 is a measure of the money supply that includes cash, checking deposits, and easily convertible near money.</p>
-            </div>
-            <div class="form-group">
-                <label for="umcsent">9. UMCSENT (Consumer Sentiment):</label>
-                <input type="text" id="umcsent" name="umcsent" required>
-                <p class="description">This index measures how optimistic consumers are about their financial prospects and the state of the economy.</p>
-            </div>
-            <div class="form-group">
-                <label for="wagegrowth">10. Overall Wage Growth:</label>
-                <input type="text" id="wagegrowth" name="wagegrowth" required>
-                <p class="description">Wage growth measures the annual change in wages and salaries of a country's workers.</p>
-            </div>
-            <div class="form-group">
-                <label for="inflrate">11. INFLRATE (Inflation Rate):</label>
-                <input type="text" id="inflrate" name="inflrate" required>
-                <p class="description">The inflation rate measures the annual percentage increase in the general price level of goods and services in an economy.</p>
-            </div>
-            <button type="submit">Insert Data</button>
-        </form>
-        <div>
-            <button onclick="window.location.href='/view_data'">View Data</button>
         </div>
-    </div>
+    </main>
 </body>
 </html>
