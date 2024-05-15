@@ -4,6 +4,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+import pandas as pd
 from . import crud, models, schemas
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession 
@@ -136,11 +137,11 @@ async def insert_data(date: str = Form(...), cpi: str = Form(...), ppi: str = Fo
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"An error occurred: {e}")
     
-@app.get("/view_data")
-async def view_data():
-    import pandas as pd
-    df = pd.read_csv("./Backend/Data/complete_data.csv")
-    return HTMLResponse(content=df.to_html(classes="data", border=0))
+@app.get("/recent_data")
+async def recent_data():
+    csv_file_path = './Backend/Data/complete_data.csv'
+    data = pd.read_csv(csv_file_path).tail(15)
+    return data.to_dict(orient='records')
 
 
 arima_model = joblib.load("./Backend/SavedModels/arimamodel.pkl")

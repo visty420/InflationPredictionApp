@@ -14,6 +14,32 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    document.getElementById('viewDataButton').addEventListener('click', function() {
+        fetch('/recent_data')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.querySelector('#data-table tbody');
+                tableBody.innerHTML = '';  // Clear existing data
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row.DATE}</td>
+                        <td>${row.CPIAUCSL}</td>
+                        <td>${row.PPIACO}</td>
+                        <td>${row.PCE}</td>
+                        <td>${row.FEDFUNDS}</td>
+                        <td>${row.UNRATE}</td>
+                        <td>${row.GDP}</td>
+                        <td>${row.M2SL}</td>
+                        <td>${row.UMCSENT}</td>
+                        <td>${row['Overall Wage Growth']}</td>
+                        <td>${row.INFLRATE}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            });
+    });
 });
 
 document.getElementById('macroDataForm').addEventListener('submit', function(event) {

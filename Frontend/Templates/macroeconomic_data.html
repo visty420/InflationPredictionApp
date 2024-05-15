@@ -89,9 +89,30 @@
                 <button type="submit">Insert Data</button>
             </form>
             <div>
-                <button onclick="window.location.href='/view_data'">View Data</button>
+                <button id="viewDataButton">View Latest Data</button>
             </div>
         </div>
+        <h2>Recent Data</h2>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>CPIAUCSL</th>
+                    <th>PPIACO</th>
+                    <th>PCE</th>
+                    <th>FEDFUNDS</th>
+                    <th>UNRATE</th>
+                    <th>GDP</th>
+                    <th>M2SL</th>
+                    <th>UMCSENT</th>
+                    <th>Wage Growth</th>
+                    <th>INFLRATE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated here by JavaScript -->
+            </tbody>
+        </table>
     </main>
     <script src="/static/Scripts/macrodata.js"></script>
 </body>
