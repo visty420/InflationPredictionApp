@@ -1,10 +1,15 @@
 from datetime import datetime, timedelta
-from fastapi import FastAPI, Request, Form, HTTPException, Depends, status
-from fastapi.responses import HTMLResponse, RedirectResponse
+import logging
+import os
+import aiosmtplib
+from fastapi import FastAPI, Request, Form, HTTPException, Depends, logger, status
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from jose import JWTError
 import pandas as pd
+from sqlalchemy import select
 from . import crud, models, schemas
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession 
@@ -18,6 +23,14 @@ import jwt
 import numpy as np
 import torch
 import csv
+from .models import User, get_db
+from .auth import authenticate_user, oauth2_scheme, verify_token, SECRET_KEY,ALGORITHM
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+from sqlalchemy.orm import Session
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="Frontend"), name="static")
@@ -271,3 +284,98 @@ async def compare_models(data: ComparisonRequest):
         "nn9_prediction": nn9_prediction,
         "lstm_prediction": lstm_prediction
     }
+
+@app.post("/token")
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+    user = await authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        logger.error("Login failed: Incorrect username or password")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    logger.info(f"Access token created for user: {user.username}")
+    return {"access_token": access_token, "token_type": "Bearer"}
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    result = await db.execute(select(User).filter(User.username == username))
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise credentials_exception
+    return user
+
+logger = logging.getLogger(__name__)
+
+@app.post("/send_data")
+async def send_data(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+    try:
+        user = await get_current_user(token, db)
+    except Exception as e:
+        logger.error(f"Error in user authentication: {e}", exc_info=True)
+        return JSONResponse(status_code=401, content={"detail": "User not authenticated"})
+    
+    csv_file_path = './Backend/Data/complete_data.csv'
+    if not os.path.exists(csv_file_path):
+        logger.error(f"CSV file not found at path: {csv_file_path}", exc_info=True)
+        return JSONResponse(status_code=404, content={"detail": "CSV file not found"})
+
+    sender_email = "gigel.parcurel@yahoo.com"
+    receiver_email = user.email
+    subject = "Macroeconomic Data"
+    body = "Please find the attached macroeconomic data CSV file."
+
+    message = MIMEMultipart()
+    message['From'] = sender_email
+    message['To'] = receiver_email
+    message['Subject'] = subject
+
+    message.attach(MIMEText(body, 'plain'))
+
+    try:
+        with open(csv_file_path, "rb") as attachment:
+            part = MIMEBase('application', 'octet-stream')
+            part.set_payload(attachment.read())
+            encoders.encode_base64(part)
+            part.add_header('Content-Disposition', f"attachment; filename=complete_data.csv")
+            message.attach(part)
+    except Exception as e:
+        logger.error(f"Error attaching file: {e}", exc_info=True)
+        return JSONResponse(status_code=500, content={"detail": "Failed to attach file"})
+
+    try:
+        email_password = "lxwbhcalxdxwpraf"
+        await aiosmtplib.send(
+            message,
+            hostname="smtp.mail.yahoo.com",
+            port=587,
+            start_tls=True,
+            username=sender_email,
+            password=email_password,
+        )
+        logger.info("Email sent successfully")
+        return JSONResponse(status_code=200, content={"message": "Email sent successfully"})
+    except aiosmtplib.SMTPException as e:
+        logger.error(f"SMTP error: {e}", exc_info=True)
+        return JSONResponse(status_code=500, content={"detail": "Failed to send email"})
+    except Exception as e:
+        logger.error(f"Error sending email: {e}", exc_info=True)
+        return JSONResponse(status_code=500, content={"detail": "Failed to send email"})

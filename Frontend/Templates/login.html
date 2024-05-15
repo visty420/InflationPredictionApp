@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="/static/Style/login.css">
+</head>
 <body>
     <header>
         <h1>Please login into your account</h1>
@@ -14,8 +15,8 @@
         <a href="/register">Register</a>
     </nav>
     <div class="container">
-        <h2>Login</h2> 
-        <form action="/login" method="post">
+        <h2>Login</h2>
+        <form id="loginForm"> <!-- ID-ul formularului trebuie să fie loginForm -->
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required class="form-input">
@@ -32,5 +33,6 @@
     <footer>
         <p>Inflation Predictor</p>
     </footer>
+    <script src="/static/Scripts/loginscript.js"></script> <!-- Adaugă link-ul către login.js -->
 </body>
 </html>

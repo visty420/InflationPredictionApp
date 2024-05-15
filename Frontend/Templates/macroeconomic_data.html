@@ -91,6 +91,9 @@
             <div>
                 <button id="viewDataButton">View Latest Data</button>
             </div>
+            <div>
+                <button id="sendDataButton">Send Data</button>
+            </div>
         </div>
         <h2>Recent Data</h2>
         <table id="data-table">
@@ -115,5 +118,36 @@
         </table>
     </main>
     <script src="/static/Scripts/macrodata.js"></script>
+    <script>
+       document.getElementById("sendDataButton").addEventListener("click", function() {
+    const token = localStorage.getItem("token"); // Retrieve token from localStorage
+    if (!token) {
+        alert("User not authenticated!");
+        return;
+    }
+
+    fetch("/send_data", {
+        method: "POST",
+        headers: {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => {
+        return response.json().then(data => {
+            if (response.ok) {
+                alert("Email sent successfully!");
+            } else {
+                alert(`Failed to send email: ${data.detail}`);
+            }
+        });
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("An error occurred while sending the email.");
+    });
+});
+
+    </script>
 </body>
 </html>
