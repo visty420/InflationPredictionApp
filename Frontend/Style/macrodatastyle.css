@@ -105,3 +105,8 @@ button:hover {
     display: flex;
     justify-content: center;
 }
+
+.warning {
+    color: red;
+    font-size: 0.9em;
+}

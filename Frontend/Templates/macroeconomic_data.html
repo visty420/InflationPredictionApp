@@ -20,59 +20,70 @@
         <h1>Macroeconomic Data</h1>
         <div class="container">
             <h2>Insert New Data</h2>
-            <form action="/insert_data" method="post">
+            <form id="macroDataForm" action="/insert_data" method="post">
                 <div class="form-group">
                     <label for="date">1. Date (MM/DD/YYYY):</label>
                     <input type="text" id="date" name="date" required>
+                    <span class="warning"></span>
                 </div>
                 <div class="form-group">
-                    <label for="cpi">2. CPIAUCSL (Consumer Price Index):</label>
-                    <input type="text" id="cpi" name="cpi" required>
+                    <label for="cpi">2. CPIAUCSL (Consumer Price Index): <span class="range">(28.97 - 300.54)</span></label>
+                    <input type="text" id="cpi" name="cpi" data-min="28.97" data-max="300.54" required>
+                    <span class="warning"></span>
                     <p class="description">The CPI measures the average change over time in the prices paid by urban consumers for a market basket of consumer goods and services.</p>
                 </div>
                 <div class="form-group">
-                    <label for="ppi">3. PPIACO (Producer Price Index):</label>
-                    <input type="text" id="ppi" name="ppi" required>
+                    <label for="ppi">3. PPIACO (Producer Price Index): <span class="range">(31.7 - 237.8)</span></label>
+                    <input type="text" id="ppi" name="ppi" data-min="31.7" data-max="237.8" required>
+                    <span class="warning"></span>
                     <p class="description">The PPI measures the average change over time in the selling prices received by domestic producers for their output.</p>
                 </div>
                 <div class="form-group">
-                    <label for="pce">4. PCE (Personal Consumption Expenditures):</label>
-                    <input type="text" id="pce" name="pce" required>
+                    <label for="pce">4. PCE (Personal Consumption Expenditures): <span class="range">(306.1 - 13678.7)</span></label>
+                    <input type="text" id="pce" name="pce" data-min="306.1" data-max="13678.7" required>
+                    <span class="warning"></span>
                     <p class="description">The PCE measures the prices that people living in the United States, or those buying on their behalf, pay for goods and services.</p>
                 </div>
                 <div class="form-group">
-                    <label for="fedfunds">5. FEDFUNDS (Federal Funds Rate):</label>
-                    <input type="text" id="fedfunds" name="fedfunds" required>
+                    <label for="fedfunds">5. FEDFUNDS (Federal Funds Rate): <span class="range">(0.07 - 19.1)</span></label>
+                    <input type="text" id="fedfunds" name="fedfunds" data-min="0.07" data-max="19.1" required>
+                    <span class="warning"></span>
                     <p class="description">This is the interest rate at which depository institutions trade federal funds with each other overnight.</p>
                 </div>
                 <div class="form-group">
-                    <label for="unrate">6. UNRATE (Unemployment Rate):</label>
-                    <input type="text" id="unrate" name="unrate" required>
+                    <label for="unrate">6. UNRATE (Unemployment Rate): <span class="range">(2.5 - 10.8)</span></label>
+                    <input type="text" id="unrate" name="unrate" data-min="2.5" data-max="10.8" required>
+                    <span class="warning"></span>
                     <p class="description">The unemployment rate represents the number of unemployed as a percentage of the labor force.</p>
                 </div>
                 <div class="form-group">
-                    <label for="gdp">7. GDP (Gross Domestic Product):</label>
-                    <input type="text" id="gdp" name="gdp" required>
+                    <label for="gdp">7. GDP (Gross Domestic Product): <span class="range">(510.33 - 20580.2)</span></label>
+                    <input type="text" id="gdp" name="gdp" data-min="510.33" data-max="20580.2" required>
+                    <span class="warning"></span>
                     <p class="description">GDP measures the total economic output of a country.</p>
                 </div>
                 <div class="form-group">
-                    <label for="m2sl">8. M2SL (Money Supply M2):</label>
-                    <input type="text" id="m2sl" name="m2sl" required>
+                    <label for="m2sl">8. M2SL (Money Supply M2): <span class="range">(286.6 - 15443.9)</span></label>
+                    <input type="text" id="m2sl" name="m2sl" data-min="286.6" data-max="15443.9" required>
+                    <span class="warning"></span>
                     <p class="description">M2 is a measure of the money supply that includes cash, checking deposits, and easily convertible near money.</p>
                 </div>
                 <div class="form-group">
-                    <label for="umcsent">9. UMCSENT (Consumer Sentiment):</label>
-                    <input type="text" id="umcsent" name="umcsent" required>
+                    <label for="umcsent">9. UMCSENT (Consumer Sentiment): <span class="range">(50.0 - 112.0)</span></label>
+                    <input type="text" id="umcsent" name="umcsent" data-min="50.0" data-max="112.0" required>
+                    <span class="warning"></span>
                     <p class="description">This index measures how optimistic consumers are about their financial prospects and the state of the economy.</p>
                 </div>
                 <div class="form-group">
-                    <label for="wagegrowth">10. Overall Wage Growth:</label>
-                    <input type="text" id="wagegrowth" name="wagegrowth" required>
+                    <label for="wagegrowth">10. Overall Wage Growth: <span class="range">(-2.4 - 13.4)</span></label>
+                    <input type="text" id="wagegrowth" name="wagegrowth" data-min="-2.4" data-max="13.4" required>
+                    <span class="warning"></span>
                     <p class="description">Wage growth measures the annual change in wages and salaries of a country's workers.</p>
                 </div>
                 <div class="form-group">
-                    <label for="inflrate">11. INFLRATE (Inflation Rate):</label>
-                    <input type="text" id="inflrate" name="inflrate" required>
+                    <label for="inflrate">11. INFLRATE (Inflation Rate): <span class="range">(-0.3 - 13.5)</span></label>
+                    <input type="text" id="inflrate" name="inflrate" data-min="-0.3" data-max="13.5" required>
+                    <span class="warning"></span>
                     <p class="description">The inflation rate measures the annual percentage increase in the general price level of goods and services in an economy.</p>
                 </div>
                 <button type="submit">Insert Data</button>
@@ -82,5 +93,6 @@
             </div>
         </div>
     </main>
+    <script src="/static/Scripts/macrodata.js"></script>
 </body>
 </html>
