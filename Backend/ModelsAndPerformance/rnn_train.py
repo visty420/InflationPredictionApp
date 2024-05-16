@@ -1,3 +1,5 @@
+from datetime import datetime
+import os
 import joblib
 import pandas as pd
 import numpy as np
@@ -8,6 +10,8 @@ from torch.utils.data import DataLoader, TensorDataset
 import torch.nn as nn
 import torch.optim as optim
 from sklearn.metrics import r2_score
+from torch.utils.tensorboard import SummaryWriter
+
 
 file_path = './Backend/Data/complete_data.csv'
 df = pd.read_csv(file_path)
@@ -18,11 +22,12 @@ target = df['INFLRATE']
 scaler = StandardScaler()
 features_scaled = scaler.fit_transform(features)
 
-scaler_path = './Backend/SavedModels/rnn_scaler.gz'
-joblib.dump(scaler, scaler_path)
-print(f"Scaler saved to {scaler_path}")
+# scaler_path = './Backend/SavedModels/rnn_scaler.gz'
+# joblib.dump(scaler, scaler_path)
+# print(f"Scaler saved to {scaler_path}")
 
 window_size = 12
+
 X, y = [], []
 for i in range(len(features_scaled) - window_size):
     X.append(features_scaled[i:(i + window_size), :])
@@ -48,10 +53,20 @@ class InflationRNN(nn.Module):
         return out
 
 
+log_dir = "logs/architecture/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+os.makedirs(log_dir, exist_ok=True)
+
+writer = SummaryWriter(log_dir)
 
 model = InflationRNN(input_size=9, hidden_size=50, num_layers=2, output_size=1)
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+sample_data = torch.tensor(X_train[:1], dtype=torch.float32)
+writer.add_graph(model, sample_data)
+
+
+writer.close()
 
 train_loader = DataLoader(TensorDataset(torch.tensor(X_train, dtype=torch.float32), torch.tensor(y_train, dtype=torch.float32)), batch_size=64, shuffle=True)
 test_loader = DataLoader(TensorDataset(torch.tensor(X_test, dtype=torch.float32), torch.tensor(y_test, dtype=torch.float32)), batch_size=64, shuffle=False)

@@ -1,3 +1,5 @@
+from datetime import datetime
+import os
 import joblib
 import torch
 import torch.nn as nn
@@ -8,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import r2_score
 import pandas as pd
 import numpy as np
-
+from torch.utils.tensorboard import SummaryWriter
 
 def create_sequences(X, y, sequence_length):
     Xs, ys = [], []
@@ -25,9 +27,9 @@ target = df['INFLRATE'].values.reshape(-1, 1)
 scaler = StandardScaler()
 X_normalized = scaler.fit_transform(features)
 
-scaler_path = './Backend/SavedModels/lstm_scaler.gz'
-joblib.dump(scaler, scaler_path)
-print(f"Scaler saved to {scaler_path}")
+# scaler_path = './Backend/SavedModels/lstm_scaler.gz'
+# joblib.dump(scaler, scaler_path)
+# print(f"Scaler saved to {scaler_path}")
 
 sequence_length = 12  
 X_seq, y_seq = create_sequences(X_normalized, target.flatten(), sequence_length)
@@ -54,9 +56,18 @@ optimal_params = {
     'dropout_rate': 0.16652487982507866,
     'batch_size': 33
 }
+
+log_dir = "logs/architecture/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+os.makedirs(log_dir, exist_ok=True)
+
+writer = SummaryWriter(log_dir)
+
 model = LSTMModel(input_dim=X_train.shape[2], hidden_dim=optimal_params['hidden_dim'], num_layers=optimal_params['num_layers'], output_dim=1, dropout_rate=optimal_params['dropout_rate'])
 optimizer = optim.Adam(model.parameters(), lr=optimal_params['lr'])
 criterion = nn.MSELoss()
+
+sample_data = torch.tensor(X_train[:1], dtype=torch.float32)
+writer.add_graph(model, sample_data)
 
 def create_dataloader(X, y, batch_size=64, shuffle=True):
     tensor_X = torch.tensor(X, dtype=torch.float32)
@@ -78,9 +89,11 @@ for epoch in range(num_epochs):
         optimizer.step()
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
 
-model_path = './Backend/SavedModels/lstm_model.pth'
-torch.save(model.state_dict(), model_path)
-print(f"Model state dictionary saved to {model_path}")
+writer.close()
+
+# model_path = './Backend/SavedModels/lstm_model.pth'
+# torch.save(model.state_dict(), model_path)
+# print(f"Model state dictionary saved to {model_path}")
 
 model.eval()
 predictions, actuals = [], []

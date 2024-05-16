@@ -1,3 +1,5 @@
+from datetime import datetime
+import os
 import joblib
 import torch
 import torch.nn as nn
@@ -7,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import numpy as np
-
+from torch.utils.tensorboard import SummaryWriter
 
 
 df = pd.read_csv('./Backend/Data/complete_data.csv')
@@ -20,9 +22,9 @@ target = df['INFLRATE'].values
 scaler = StandardScaler()
 X_normalized = scaler.fit_transform(features)
 
-scaler_path = './Backend/SavedModels/9in_model_scaler.gz'
-joblib.dump(scaler, scaler_path)
-print(f"Scaler saved to {scaler_path}")
+# scaler_path = './Backend/SavedModels/9in_model_scaler.gz'
+# joblib.dump(scaler, scaler_path)
+# print(f"Scaler saved to {scaler_path}")
 
 X_train, X_test, y_train, y_test = train_test_split(X_normalized, target, test_size=0.2, random_state=42)
 
@@ -45,6 +47,8 @@ class InflationPredictor(nn.Module):
     def forward(self, x):
         return self.network(x)
 
+log_dir = "logs/architecture/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+os.makedirs(log_dir, exist_ok=True)
 
 def create_dataloader(X, y, batch_size=64):
     tensor_X = torch.tensor(X, dtype=torch.float32)
@@ -56,10 +60,14 @@ def create_dataloader(X, y, batch_size=64):
 train_loader = create_dataloader(X_train, y_train)
 test_loader = create_dataloader(X_test, y_test)
 
+writer = SummaryWriter(log_dir)
+
 model = InflationPredictor(input_size=9, num_layers=best_params['num_layers'], num_neurons=best_params['num_neurons'])
 optimizer = optim.Adam(model.parameters(), lr=best_params['lr'])
 criterion = nn.MSELoss()
 
+sample_data = torch.tensor(X_train[:1], dtype=torch.float32)
+writer.add_graph(model, sample_data)
 
 for epoch in range(best_params['epochs']):
     model.train()
@@ -71,9 +79,10 @@ for epoch in range(best_params['epochs']):
         optimizer.step()
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
 
-model_path = './Backend/SavedModels/9in_model.pth'
-torch.save(model.state_dict(), model_path)
-print(f"Model saved to {model_path}")
+# model_path = './Backend/SavedModels/9in_model.pth'
+# torch.save(model.state_dict(), model_path)
+# print(f"Model saved to {model_path}")
+writer.close()
 
 new_features = np.array([[29.11,31.7,318.2,4,5,524.2403333,294.1,95.05,3.918944099]])  
 
