@@ -20,7 +20,7 @@
         <h1>Predict Inflation Rates</h1>
         <form id="predictionForm">
             <div id="inputFields"></div>
-            <select name="model" id="modelSelect" onchange="updateInputFields()">
+            <select name="model" id="modelSelect" onchange="updateInputFields(); updateModelImage();">
                 <option value="ARIMA">ARIMA</option>
                 <option value="LSTM">LSTM (9 inputs)</option>
                 <option value="NN_3">Neural Network (3 inputs)</option>
@@ -30,6 +30,10 @@
             <button type="submit">Predict</button>
         </form>
         <div id="result"></div>
+        <div id="modelArchitecture">
+            <h2>Model Architecture</h2>
+            <img id="modelImage" src="" alt="Model architecture" style="max-width: 100%; height: auto; display: none;">
+        </div>
     </main>
     <script src="/static/Scripts/predictions.js"></script>
 </body>

@@ -76,3 +76,34 @@ function updateInputFields() {
         inputFields.innerHTML += `<input type="text" name="feature${i + 1}" placeholder="${placeholders[model][i]}" required>`;
     }
 }
+function updateModelImage() {
+    const modelSelect = document.getElementById('modelSelect');
+    const modelImage = document.getElementById('modelImage');
+    let imageUrl = '';
+
+    switch(modelSelect.value) {
+        case 'LSTM':
+            imageUrl = '/auxiliaries/lstm_arhitecture.png';
+            break;
+        case 'NN_3':
+            imageUrl = '/auxiliaries/3inmlp_arhitecture.png';
+            break;
+        case 'NN_9':
+            imageUrl = '/auxiliaries/9inmlp_arhitecture.png';
+            break;
+        case 'RNN':
+            imageUrl = '/auxiliaries/rnn_arhitecture.png';
+            break;
+        default:
+            imageUrl = '';
+    }
+
+    if (imageUrl) {
+        modelImage.src = imageUrl;
+        modelImage.style.display = 'block';
+    } else {
+        modelImage.style.display = 'none';
+    }
+}
+
+document.getElementById('modelSelect').addEventListener('change', updateModelImage);

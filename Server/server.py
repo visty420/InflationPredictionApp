@@ -34,6 +34,7 @@ from sqlalchemy.orm import Session
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="Frontend"), name="static")
+app.mount("/auxiliaries", StaticFiles(directory="Auxiliaries"), name="auxiliaries")
 templates = Jinja2Templates(directory="Frontend/templates")
 SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
