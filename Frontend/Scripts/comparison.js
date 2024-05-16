@@ -1,13 +1,35 @@
 document.addEventListener('DOMContentLoaded', function() {
     const inputFields = document.getElementById('inputFields');
-    const inputLabels = ['Consumer Price Index', 'Producer Price Index', 'Personal Consumption Expenditures', 'Federal Funds Rate', 'Unemployment Rate', 'Gross Domestic Product', 'Money Supply M2', 'Consumer Sentiment', 'Wage Growth'];
-    
-    inputLabels.forEach(label => {
+    const inputLabels = [
+        { id: 'CPIAUCSL', label: 'Consumer Price Index', placeholder: 'Consumer Price Index' },
+        { id: 'PPIACO', label: 'Producer Price Index', placeholder: 'Producer Price Index' },
+        { id: 'PCE', label: 'Personal Consumption Expenditures', placeholder: 'Personal Consumption Expenditures' },
+        { id: 'FEDFUNDS', label: 'Federal Funds Rate', placeholder: 'Federal Funds Rate' },
+        { id: 'UNRATE', label: 'Unemployment Rate', placeholder: 'Unemployment Rate' },
+        { id: 'GDP', label: 'Gross Domestic Product', placeholder: 'Gross Domestic Product' },
+        { id: 'M2SL', label: 'Money Supply M2', placeholder: 'Money Supply M2' },
+        { id: 'UMCSENT', label: 'Consumer Sentiment', placeholder: 'Consumer Sentiment' },
+        { id: 'WageGrowth', label: 'Wage Growth', placeholder: 'Wage Growth' }
+    ];
+
+    inputLabels.forEach(field => {
+        const div = document.createElement('div');
+        div.className = 'form-group';
+
+        const label = document.createElement('label');
+        label.htmlFor = field.id;
+        label.textContent = field.label;
+
         const input = document.createElement('input');
         input.type = 'text';
-        input.placeholder = label;
+        input.id = field.id;
+        input.name = field.id;
+        input.placeholder = field.placeholder;
         input.required = true;
-        inputFields.appendChild(input);
+
+        div.appendChild(label);
+        div.appendChild(input);
+        inputFields.appendChild(div);
     });
 
     let chartInstance = null;

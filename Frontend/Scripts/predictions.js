@@ -56,26 +56,66 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
 function updateInputFields() {
     const modelSelect = document.getElementById('modelSelect');
-    const model = modelSelect.value;
-    const inputFields = document.getElementById('inputFields');
-    inputFields.innerHTML = '';
+    const inputFieldsDiv = document.getElementById('inputFields');
 
-    const placeholders = {
-        'ARIMA': ['Months to predict'],
-        'LSTM': ['Consumer Price Index', 'Producer Price Index', 'Personal Consumption Expenditures', 'Federal Funds Rate', 'Unemployment Rate', 'Gross Domestic Product', 'Money Supply M2', 'Consumer Sentiment', 'Wage Growth'],
-        'NN_3': ['Consumer Price Index', 'Producer Price Index', 'Personal Consumption Expenditures'],
-        'NN_9': ['Consumer Price Index', 'Producer Price Index', 'Personal Consumption Expenditures', 'Federal Funds Rate', 'Unemployment Rate', 'Gross Domestic Product', 'Money Supply M2', 'Consumer Sentiment', 'Wage Growth'],
-        'RNN': ['Consumer Price Index', 'Producer Price Index', 'Personal Consumption Expenditures', 'Federal Funds Rate', 'Unemployment Rate', 'Gross Domestic Product', 'Money Supply M2', 'Consumer Sentiment', 'Wage Growth']
-    };
+    inputFieldsDiv.innerHTML = '';  // Golește câmpurile existente
 
-    const inputCount = placeholders[model].length;
-    for (let i = 0; i < inputCount; i++) {
-        inputFields.innerHTML += `<input type="text" name="feature${i + 1}" placeholder="${placeholders[model][i]}" required>`;
+    // Definește câmpurile de input pentru fiecare model
+    const commonFields = [
+        { id: 'CPIAUCSL', label: 'Consumer Price Index', placeholder: 'Consumer Price Index' },
+        { id: 'PPIACO', label: 'Producer Price Index', placeholder: 'Producer Price Index' },
+        { id: 'PCE', label: 'Personal Consumption Expenditures', placeholder: 'Personal Consumption Expenditures' },
+        { id: 'FEDFUNDS', label: 'Federal Funds Rate', placeholder: 'Federal Funds Rate' },
+        { id: 'UNRATE', label: 'Unemployment Rate', placeholder: 'Unemployment Rate' },
+        { id: 'GDP', label: 'Gross Domestic Product', placeholder: 'Gross Domestic Product' },
+        { id: 'M2SL', label: 'Money Supply M2', placeholder: 'Money Supply M2' },
+        { id: 'UMCSENT', label: 'Consumer Sentiment', placeholder: 'Consumer Sentiment' },
+        { id: 'WageGrowth', label: 'Overall Wage Growth', placeholder: 'Overall Wage Growth' }
+    ];
+
+    let fieldsToAdd = [];
+
+    switch (modelSelect.value) {
+        case 'ARIMA':
+            fieldsToAdd = [
+                { id: 'ARIMAValue', label: 'ARIMA Input', placeholder: 'ARIMA Input' }
+            ];
+            break;
+        case 'LSTM':
+        case 'NN_9':
+        case 'RNN':
+            fieldsToAdd = commonFields;  // Toate cele 9 câmpuri pentru LSTM, NN_9 și RNN
+            break;
+        case 'NN_3':
+            fieldsToAdd = commonFields.slice(0, 3);  // Primele 3 câmpuri pentru NN_3
+            break;
+        default:
+            fieldsToAdd = [];  // Nicio altă opțiune nu adaugă câmpuri
     }
+
+    // Adaugă câmpurile de input la formular
+    fieldsToAdd.forEach(field => {
+        const div = document.createElement('div');
+        div.className = 'form-group';
+
+        const label = document.createElement('label');
+        label.htmlFor = field.id;
+        label.textContent = field.label;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = field.id;
+        input.name = field.id;
+        input.placeholder = field.placeholder;
+
+        div.appendChild(label);
+        div.appendChild(input);
+        inputFieldsDiv.appendChild(div);
+    });
 }
+
 function updateModelImage() {
     const modelSelect = document.getElementById('modelSelect');
     const modelImage = document.getElementById('modelImage');
@@ -107,3 +147,4 @@ function updateModelImage() {
 }
 
 document.getElementById('modelSelect').addEventListener('change', updateModelImage);
+document.addEventListener('DOMContentLoaded', updateInputFields);

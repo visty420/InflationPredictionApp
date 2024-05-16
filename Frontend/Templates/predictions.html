@@ -19,7 +19,44 @@
     <main>
         <h1>Predict Inflation Rates</h1>
         <form id="predictionForm">
-            <div id="inputFields"></div>
+            <div id="inputFields">
+                <div class="form-group">
+                    <label for="CPIAUCSL">Consumer Price Index</label>
+                    <input type="text" id="CPIAUCSL" name="CPIAUCSL" placeholder="Consumer Price Index">
+                </div>
+                <div class="form-group">
+                    <label for="PPIACO">Producer Price Index</label>
+                    <input type="text" id="PPIACO" name="PPIACO" placeholder="Producer Price Index">
+                </div>
+                <div class="form-group">
+                    <label for="PCE">Personal Consumption Expenditures</label>
+                    <input type="text" id="PCE" name="PCE" placeholder="Personal Consumption Expenditures">
+                </div>
+                <div class="form-group">
+                    <label for="FEDFUNDS">Federal Funds Rate</label>
+                    <input type="text" id="FEDFUNDS" name="FEDFUNDS" placeholder="Federal Funds Rate">
+                </div>
+                <div class="form-group">
+                    <label for="UNRATE">Unemployment Rate</label>
+                    <input type="text" id="UNRATE" name="UNRATE" placeholder="Unemployment Rate">
+                </div>
+                <div class="form-group">
+                    <label for="GDP">Gross Domestic Product</label>
+                    <input type="text" id="GDP" name="GDP" placeholder="Gross Domestic Product">
+                </div>
+                <div class="form-group">
+                    <label for="M2SL">Money Supply M2</label>
+                    <input type="text" id="M2SL" name="M2SL" placeholder="Money Supply M2">
+                </div>
+                <div class="form-group">
+                    <label for="UMCSENT">Consumer Sentiment</label>
+                    <input type="text" id="UMCSENT" name="UMCSENT" placeholder="Consumer Sentiment">
+                </div>
+                <div class="form-group">
+                    <label for="WageGrowth">Overall Wage Growth</label>
+                    <input type="text" id="WageGrowth" name="WageGrowth" placeholder="Overall Wage Growth">
+                </div>
+            </div>
             <select name="model" id="modelSelect" onchange="updateInputFields(); updateModelImage();">
                 <option value="ARIMA">ARIMA</option>
                 <option value="LSTM">LSTM (9 inputs)</option>

@@ -22,7 +22,6 @@ header {
 
 nav {
     background: #46516e;
-    margin-top: 10px; 
     padding: 10px 0;
     display: flex;
     justify-content: center;
@@ -30,14 +29,29 @@ nav {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-nav a {
-    color: #ffffff;
-    padding: 10px 20px;
-    text-decoration: none;
-    font-size: 18px;
+.navbar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
 
-nav a:hover {
+.navbar li {
+    float: left;
+}
+
+.navbar li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.navbar li a:hover {
     background-color: #354059;
 }
 
@@ -61,7 +75,17 @@ form {
     gap: 10px;
 }
 
-input {
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input, select {
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -94,3 +118,4 @@ button:hover {
 #plot {
     margin-top: 20px;
 }
+
