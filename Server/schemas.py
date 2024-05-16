@@ -28,3 +28,6 @@ class ARIMAPredictionRequest(BaseModel):
 
 class ComparisonRequest(BaseModel):
     features: List[float]
+
+class ModelRequest(BaseModel):
+    model_name: str

@@ -55,7 +55,38 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Failed to predict inflation. Check the console for more information.');
         });
     });
+
+    document.getElementById('getModelAndScalerButton').addEventListener('click', function() {
+        const modelName = document.getElementById('modelSelect').value;
+        const token = localStorage.getItem("token"); // Retrieve token from localStorage
+        if (!token) {
+            alert("User not authenticated!");
+            return;
+        }
+
+        fetch('/send_model_scaler', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ model_name: modelName })
+        })
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            if (status === 200) {
+                alert('Model and scaler sent successfully!');
+            } else {
+                alert(`Failed to send model and scaler: ${body.detail}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while sending the model and scaler.');
+        });
+    });
 });
+
 function updateInputFields() {
     const modelSelect = document.getElementById('modelSelect');
     const inputFieldsDiv = document.getElementById('inputFields');

@@ -380,3 +380,85 @@ async def send_data(token: str = Depends(oauth2_scheme), db: AsyncSession = Depe
     except Exception as e:
         logger.error(f"Error sending email: {e}", exc_info=True)
         return JSONResponse(status_code=500, content={"detail": "Failed to send email"})
+    
+@app.post("/send_model_scaler")
+async def send_model_scaler(request: Request, data: schemas.ModelRequest, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+    try:
+        user = await get_current_user(token, db)
+    except Exception as e:
+        logger.error(f"Error in user authentication: {e}", exc_info=True)
+        return JSONResponse(status_code=401, content={"detail": "User not authenticated"})
+    
+    model_name = data.model_name
+    model_path = ""
+    scaler_path = ""
+    if model_name == "ARIMA":
+        model_path = "./Backend/SavedModels/arimamodel.pkl"
+        scaler_path = "./Backend/SavedModels/rnn_scaler.gz"
+    elif model_name == "LSTM":
+        model_path = "./Backend/SavedModels/lstmmodel.pth"
+        scaler_path = "./Backend/SavedModels/lstmscaler.gz"
+    elif model_name == "NN_3":
+        model_path = "./Backend/SavedModels/3inmodel.pth"
+        scaler_path = "./Backend/SavedModels/3inmodelscaler.gz"
+    elif model_name == "NN_9":
+        model_path = "./Backend/SavedModels/9inmodel.pth"
+        scaler_path = "./Backend/SavedModels/9inmodelscaler.gz"
+    elif model_name == "RNN":
+        model_path = "./Backend/SavedModels/rnn_model.pth"
+        scaler_path = "./Backend/SavedModels/rnn_scaler.gz"
+    else:
+        return JSONResponse(status_code=400, content={"detail": "Model not supported"})
+
+    sender_email = "gigel.parcurel@yahoo.com"
+    receiver_email = user.email
+    subject = f"{model_name} Model and Scaler"
+    body = f"Please find the attached {model_name} model and scaler files."
+
+    message = MIMEMultipart()
+    message['From'] = sender_email
+    message['To'] = receiver_email
+    message['Subject'] = subject
+
+    message.attach(MIMEText(body, 'plain'))
+
+    try:
+        with open(model_path, "rb") as attachment:
+            part = MIMEBase('application', 'octet-stream')
+            part.set_payload(attachment.read())
+            encoders.encode_base64(part)
+            part.add_header('Content-Disposition', f"attachment; filename={model_name}_model.pth")
+            message.attach(part)
+    except Exception as e:
+        logger.error(f"Error attaching model file: {e}", exc_info=True)
+        return JSONResponse(status_code=500, content={"detail": "Failed to attach model file"})
+
+    try:
+        with open(scaler_path, "rb") as attachment:
+            part = MIMEBase('application', 'octet-stream')
+            part.set_payload(attachment.read())
+            encoders.encode_base64(part)
+            part.add_header('Content-Disposition', f"attachment; filename={model_name}_scaler.gz")
+            message.attach(part)
+    except Exception as e:
+        logger.error(f"Error attaching scaler file: {e}", exc_info=True)
+        return JSONResponse(status_code=500, content={"detail": "Failed to attach scaler file"})
+
+    try:
+        email_password = "lxwbhcalxdxwpraf"
+        await aiosmtplib.send(
+            message,
+            hostname="smtp.mail.yahoo.com",
+            port=587,
+            start_tls=True,
+            username=sender_email,
+            password=email_password,
+        )
+        logger.info("Email sent successfully")
+        return JSONResponse(status_code=200, content={"message": "Email sent successfully"})
+    except aiosmtplib.SMTPException as e:
+        logger.error(f"SMTP error: {e}", exc_info=True)
+        return JSONResponse(status_code=500, content={"detail": "Failed to send email"})
+    except Exception as e:
+        logger.error(f"Error sending email: {e}", exc_info=True)
+        return JSONResponse(status_code=500, content={"detail": "Failed to send email"})
