@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    updateInputFields();  // Call initial to set up form fields based on default selected model
-
+    updateInputFields();  
     document.getElementById('predictionForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -36,17 +35,17 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             const resultDiv = document.getElementById('result');
             resultDiv.style.display = 'block';
-            resultDiv.innerHTML = '';  // Clear previous contents
+            resultDiv.innerHTML = '';  
 
             if (Array.isArray(data.predicted_inflation)) {
-                // Special treatment for ARIMA, where predicted_inflation is an array
+                
                 data.predicted_inflation.forEach((inflation, index) => {
                     const monthResult = document.createElement('div');
                     monthResult.innerText = `Month ${index + 1}: Predicted Inflation: ${inflation}`;
                     resultDiv.appendChild(monthResult);
                 });
             } else {
-                // Treatment for other models
+               
                 resultDiv.innerText = 'Predicted Inflation: ' + data.predicted_inflation;
             }
         })
@@ -58,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('getModelAndScalerButton').addEventListener('click', function() {
         const modelName = document.getElementById('modelSelect').value;
-        const token = localStorage.getItem("token"); // Retrieve token from localStorage
+        const token = localStorage.getItem("token"); 
         if (!token) {
             alert("User not authenticated!");
             return;

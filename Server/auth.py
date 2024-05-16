@@ -8,7 +8,6 @@ from sqlalchemy.future import select
 from .models import User, get_db
 from passlib.context import CryptContext
 
-# Configurare logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 

@@ -86,7 +86,7 @@
                     <span class="warning"></span>
                     <p class="description">The inflation rate measures the annual percentage increase in the general price level of goods and services in an economy.</p>
                 </div>
-                <button type="submit">Insert Data</button>
+                <button id="insertDataButton">Insert Data</button>
             </form>
             <div>
                 <button id="viewDataButton">View Latest Data</button>
@@ -113,14 +113,14 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Data will be populated here by JavaScript -->
+            
             </tbody>
         </table>
     </main>
     <script src="/static/Scripts/macrodata.js"></script>
     <script>
        document.getElementById("sendDataButton").addEventListener("click", function() {
-    const token = localStorage.getItem("token"); // Retrieve token from localStorage
+    const token = localStorage.getItem("token"); 
     if (!token) {
         alert("User not authenticated!");
         return;

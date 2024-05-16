@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 const tableBody = document.querySelector('#data-table tbody');
-                tableBody.innerHTML = '';  // Clear existing data
+                tableBody.innerHTML = '';  
                 data.forEach(row => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
