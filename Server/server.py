@@ -3,7 +3,7 @@ import logging
 import os
 import aiosmtplib
 from fastapi import FastAPI, Request, Form, HTTPException, Depends, logger, status
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -76,6 +76,10 @@ except Exception as e:
 @app.get("/")
 def main_page(request: Request):
     return templates.TemplateResponse("mainpage.html", {"request": request})
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse("Server/favicon.ico")
 
 @app.get("/factors")
 def macroeconomicdata_page(request : Request):
