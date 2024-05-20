@@ -110,3 +110,11 @@ p {
     font-weight: bold;
     font-size: 1.2em;
 }
+
+.welcome-guest {
+    color: red;
+}
+
+.welcome-user {
+    color: green;
+}

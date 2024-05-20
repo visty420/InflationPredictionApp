@@ -16,12 +16,14 @@ document.addEventListener("DOMContentLoaded", async function() {
     try {
         let token = getCookie("token");
         if (!token) {
-            token = localStorage.getItem("token"); // Fallback to local storage
+            token = localStorage.getItem("token"); 
         }
-        console.log("Token:", token);  // Log token
+        console.log("Token:", token);  
 
         if (!token) {
             welcomeMessage.textContent = "Hello, Guest";
+            welcomeMessage.classList.add("welcome-guest");
+            welcomeMessage.classList.remove("welcome-user");
             logoutButton.style.display = "none";
             loginButton.style.backgroundColor = "";
             registerButton.style.backgroundColor = "";
@@ -34,10 +36,12 @@ document.addEventListener("DOMContentLoaded", async function() {
             }
         });
         const data = await response.json();
-        console.log("Response data:", data);  // Log response data
+        console.log("Response data:", data);  
 
         if (data.username) {
             welcomeMessage.textContent = `Hello, ${data.username}`;
+            welcomeMessage.classList.add("welcome-user");
+            welcomeMessage.classList.remove("welcome-guest");
             welcomeMessage.style.fontWeight = "bold";
             welcomeMessage.style.fontSize = "1.2em";
             logoutButton.style.display = "block";
@@ -45,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             registerButton.style.backgroundColor = "red";
             logoutButton.style.backgroundColor = "blue";
 
-            // Prevent accessing login/register when logged in
+            
             loginButton.addEventListener("click", function(event) {
                 event.preventDefault();
                 alert("You are already logged in!");
@@ -57,6 +61,8 @@ document.addEventListener("DOMContentLoaded", async function() {
             });
         } else {
             welcomeMessage.textContent = "Hello, Guest";
+            welcomeMessage.classList.add("welcome-guest");
+            welcomeMessage.classList.remove("welcome-user");
             logoutButton.style.display = "none";
             loginButton.style.backgroundColor = "";
             registerButton.style.backgroundColor = "";
@@ -64,12 +70,14 @@ document.addEventListener("DOMContentLoaded", async function() {
     } catch (error) {
         console.error("Error fetching current user:", error);
         welcomeMessage.textContent = "Hello, Guest";
+        welcomeMessage.classList.add("welcome-guest");
+        welcomeMessage.classList.remove("welcome-user");
         logoutButton.style.display = "none";
         loginButton.style.backgroundColor = "";
         registerButton.style.backgroundColor = "";
     }
 
-    // Logout functionality
+    
     logoutButton.addEventListener("click", function() {
         localStorage.removeItem("token");
         document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
