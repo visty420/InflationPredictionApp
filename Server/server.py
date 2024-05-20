@@ -474,3 +474,17 @@ async def send_model_scaler(request: Request, data: schemas.ModelRequest, token:
     except Exception as e:
         logger.error(f"Error sending email: {e}", exc_info=True)
         return JSONResponse(status_code=500, content={"detail": "Failed to send email"})
+    
+
+@app.get("/current_user", response_class=JSONResponse)
+async def get_current_user_info(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+    try:
+        user = await get_current_user(token, db)
+        logging.info(f"Current user: {user.username}")
+        return {"username": user.username}
+    except HTTPException as e:
+        logging.error(f"HTTPException: {e}")
+        return {"username": "Guest"}
+    except Exception as e:
+        logging.error(f"Exception: {e}")
+        return {"username": "Guest"}

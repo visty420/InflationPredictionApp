@@ -31,8 +31,7 @@ header {
     font-size: 28px;
     font-weight: bold;
     position: relative;
-    right:-75px;
-
+    right: -75px;
 }
 
 .auth-section {
@@ -42,7 +41,8 @@ header {
     z-index: 2; 
 }
 
-.auth-section a {
+.auth-section a,
+.auth-section button {
     color: #ffffff;
     background-color: #007BFF;
     padding: 8px 16px;
@@ -51,9 +51,12 @@ header {
     border-radius: 5px;
     margin-left: 10px; 
     transition: background-color 0.3s;
+    border: none;
+    cursor: pointer;
 }
 
-.auth-section a:hover {
+.auth-section a:hover,
+.auth-section button:hover {
     background-color: #0056b3;
 }
 
@@ -101,4 +104,9 @@ h2 {
 p {
     font-size: 16px;
     line-height: 1.6;
+}
+
+.welcome-message {
+    font-weight: bold;
+    font-size: 1.2em;
 }

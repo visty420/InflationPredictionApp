@@ -6,13 +6,15 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <title>Main Page</title>
     <link rel="stylesheet" href="/static/Style/mainpage.css">
+    <script src="/static/Scripts/mainpage.js" defer></script> <!-- Asigură-te că fișierul JavaScript este încărcat -->
 </head>
 <body>
     <header>
         <div class="header-title">Inflation Prediction App</div>
         <div class="auth-section">
-            <a href="/register">Register</a>
-            <a href="/login">Login</a>
+            <a id="register-button" href="/register">Register</a>
+            <a id="login-button" href="/login">Login</a>
+            <button id="logout-button" style="display: none;">Logout</button> <!-- Butonul de logout -->
         </div>
     </header>
     <nav>
@@ -23,6 +25,7 @@
     </nav>
     <div class="container">
         <h1>Welcome to the Inflation Predictor App</h1>
+        <p id="welcome-message" class="welcome-message">Hello, Guest</p> <!-- Aici va fi afișat mesajul de întâmpinare -->
         <p>This application allows users to understand and anticipate changes in their purchasing power based on inflation predictions. Here are some of the ways you can use the Inflation Predictor:</p>
         
         <h2>Personal Financial Planning</h2>
