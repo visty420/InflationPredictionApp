@@ -8,50 +8,37 @@ body, html {
 
 header {
     background-color: #003366;
-    color: white;
+    color: #ffffff;
     padding: 10px 20px;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between; 
     align-items: center;
+    position: relative; 
 }
 
 .header-title {
+    flex-grow: 1;
     text-align: center;
-    width: 100%; 
+    font-size: 28px;
+    font-weight: bold;
+    position: relative;
 }
 
 nav {
     background: #46516e;
-    padding: 10px 0;
+    padding: 15px 0;
     display: flex;
     justify-content: center;
-    width: 100%; 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.navbar {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
-.navbar li {
-    float: left;
-}
-
-.navbar li a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
+nav a {
+    color: #ffffff;
+    padding: 10px 20px;
     text-decoration: none;
+    font-size: 18px;
 }
 
-.navbar li a:hover {
+nav a:hover {
     background-color: #354059;
 }
 

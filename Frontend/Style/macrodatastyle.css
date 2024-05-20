@@ -8,26 +8,27 @@ body, html {
 
 header {
     background-color: #003366;
-    color: white;
+    color: #ffffff;
     padding: 10px 20px;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between; 
     align-items: center;
+    position: relative; 
 }
 
 .header-title {
+    flex-grow: 1;
     text-align: center;
-    width: 100%; 
+    font-size: 28px;
+    font-weight: bold;
+    position: relative;
 }
 
 nav {
     background: #46516e;
-    margin-top: 10px; 
-    padding: 10px 0;
+    padding: 15px 0;
     display: flex;
     justify-content: center;
-    width: 100%; 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 nav a {
