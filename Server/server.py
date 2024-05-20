@@ -161,6 +161,14 @@ async def recent_data():
     data = pd.read_csv(csv_file_path).tail(15)
     return data.to_dict(orient='records')
 
+@app.get("/check-email")
+async def check_email(email: str, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).filter(User.email == email))
+    user = result.scalar_one_or_none()
+    if user:
+        return JSONResponse(status_code=400, content={"detail": "Email already registered"})
+    return JSONResponse(status_code=200, content={"detail": "Email available"})
+
 
 arima_model = joblib.load("./Backend/SavedModels/arimamodel.pkl")
 class LSTMModel(nn.Module):
