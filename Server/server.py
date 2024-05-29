@@ -170,7 +170,7 @@ async def check_email(email: str, db: AsyncSession = Depends(get_db)):
     return JSONResponse(status_code=200, content={"detail": "Email available"})
 
 
-arima_model = joblib.load("./Backend/SavedModels/arimamodel.pkl")
+arima_model = joblib.load("./Backend/SavedModels/arima_model_212.pkl")
 class LSTMModel(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_layers, output_dim, dropout_rate=0.0):
         super(LSTMModel, self).__init__()
@@ -224,7 +224,7 @@ nn_9inputs_model.eval()
 
 
 def predict_arima(features, months):
-    arima_model = joblib.load('./Backend/SavedModels/arimamodel.pkl')
+    arima_model = joblib.load('./Backend/SavedModels/arima_model_212.pkl')
     prediction = arima_model.forecast(steps=months)
     formatted_prediction = f"{prediction.iloc[-1]:.2f}%"  
     return formatted_prediction
@@ -275,7 +275,7 @@ async def predict_inflation(data: schemas.PredictionRequest):
 
 @app.post("/predict/arima/")
 async def predict_arima(request: ARIMAPredictionRequest):
-    arima_model = joblib.load('./Backend/SavedModels/arimamodel.pkl')
+    arima_model = joblib.load('./Backend/SavedModels/arima_model_212.pkl')
     predictions = arima_model.forecast(steps=request.months)
     formatted_predictions = [f"{pred:.2f}%" for pred in predictions]
     return {"predicted_inflation": formatted_predictions}
@@ -405,7 +405,7 @@ async def send_model_scaler(request: Request, data: schemas.ModelRequest, token:
     model_path = ""
     scaler_path = ""
     if model_name == "ARIMA":
-        model_path = "./Backend/SavedModels/arimamodel.pkl"
+        model_path = "./Backend/SavedModels/arima_model_212.pkl"
         scaler_path = "./Backend/SavedModels/rnn_scaler.gz"
     elif model_name == "LSTM":
         model_path = "./Backend/SavedModels/lstmmodel.pth"
