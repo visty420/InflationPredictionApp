@@ -90,9 +90,8 @@ function updateInputFields() {
     const modelSelect = document.getElementById('modelSelect');
     const inputFieldsDiv = document.getElementById('inputFields');
 
-    inputFieldsDiv.innerHTML = '';  // Golește câmpurile existente
+    inputFieldsDiv.innerHTML = ''; 
 
-    // Definește câmpurile de input pentru fiecare model
     const commonFields = [
         { id: 'CPIAUCSL', label: 'Consumer Price Index', placeholder: 'Consumer Price Index' },
         { id: 'PPIACO', label: 'Producer Price Index', placeholder: 'Producer Price Index' },
@@ -116,16 +115,15 @@ function updateInputFields() {
         case 'LSTM':
         case 'NN_9':
         case 'RNN':
-            fieldsToAdd = commonFields;  // Toate cele 9 câmpuri pentru LSTM, NN_9 și RNN
+            fieldsToAdd = commonFields;  
             break;
         case 'NN_3':
-            fieldsToAdd = commonFields.slice(0, 3);  // Primele 3 câmpuri pentru NN_3
+            fieldsToAdd = commonFields.slice(0, 3);  
             break;
         default:
-            fieldsToAdd = [];  // Nicio altă opțiune nu adaugă câmpuri
+            fieldsToAdd = [];  
     }
 
-    // Adaugă câmpurile de input la formular
     fieldsToAdd.forEach(field => {
         const div = document.createElement('div');
         div.className = 'form-group';

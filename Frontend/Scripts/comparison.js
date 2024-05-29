@@ -46,13 +46,13 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({ features: inputs })
         })
-        .then(response => response.text())
-        .then(text => {
-            console.log("Server response:", text);
-            const data = JSON.parse(text);
+        .then(response => response.json())
+        .then(data => {
+            console.log("Server response:", data);
             document.getElementById('nn3Result').innerText = 'NN (3 inputs): ' + data.nn3_prediction;
             document.getElementById('nn9Result').innerText = 'NN (9 inputs): ' + data.nn9_prediction;
             document.getElementById('lstmResult').innerText = 'LSTM: ' + data.lstm_prediction;
+            document.getElementById('rnnResult').innerText = "RNN: " + data.rnn_prediction;
 
             plotResults(data);
         })
@@ -72,11 +72,16 @@ document.addEventListener('DOMContentLoaded', function() {
         chartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['NN (3 inputs)', 'NN (9 inputs)', 'LSTM'],
+                labels: ['NN (3 inputs)', 'NN (9 inputs)', 'LSTM', 'RNN'],
                 datasets: [{
                     label: 'Predicted Inflation',
-                    data: [parseFloat(data.nn3_prediction), parseFloat(data.nn9_prediction), parseFloat(data.lstm_prediction)],
-                    backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe']
+                    data: [
+                        parseFloat(data.nn3_prediction), 
+                        parseFloat(data.nn9_prediction), 
+                        parseFloat(data.lstm_prediction), 
+                        parseFloat(data.rnn_prediction)
+                    ],
+                    backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56']
                 }]
             },
             options: {

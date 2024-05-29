@@ -43,36 +43,6 @@ PASSWORD_REGEX = r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
 EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-
-class InflationRNN(nn.Module):
-    def __init__(self, input_size, hidden_size, num_layers, output_size):
-        super(InflationRNN, self).__init__()
-        self.hidden_size = hidden_size
-        self.num_layers = num_layers
-        self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_size, output_size)
-
-    def forward(self, x):
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
-        out, _ = self.rnn(x, h0)
-        out = self.fc(out[:, -1, :])  
-        return out
-
-def custom_load(path):
-    return torch.load(path, map_location=lambda storage, loc: storage)
-
-rnn_scaler_path = "./Backend/SavedModels/rnn_scaler.gz"
-rnn_model_path = "./Backend/SavedModels/rnn_model.pth"
-
-try:
-    rnn_scaler = joblib.load(rnn_scaler_path)
-    rnn_model = InflationRNN(input_size=9, hidden_size=50, num_layers=2, output_size=1)
-    rnn_model.load_state_dict(custom_load(rnn_model_path))
-    rnn_model.eval()
-    print("RNN model and scaler loaded successfully.")
-except Exception as e:
-    print(f"Failed to load RNN model or scaler: {e}")
-
 @app.get("/")
 def main_page(request: Request):
     return templates.TemplateResponse("mainpage.html", {"request": request})
@@ -222,6 +192,31 @@ nn_9inputs_model = InflationPredictor(input_size=9, num_layers=3, num_neurons=98
 nn_9inputs_model.load_state_dict(torch.load("./Backend/SavedModels/9inmodel.pth"))
 nn_9inputs_model.eval()
 
+class InflationRNN(torch.nn.Module):
+    def __init__(self, input_size, hidden_size, num_layers, output_size):
+        super(InflationRNN, self).__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_size, output_size)
+
+    def forward(self, x):
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
+        out, _ = self.rnn(x, h0)
+        out = self.fc(out[:, -1, :])  
+        return out
+    
+rnn_scaler_path = "./Backend/SavedModels/rnn_scaler.gz"
+rnn_model_path = "./Backend/SavedModels/rnn_model.pth"
+
+try:
+    rnn_scaler = joblib.load(rnn_scaler_path)
+    rnn_model = InflationRNN(input_size=9, hidden_size=100, num_layers=3, output_size=1)
+    rnn_model.load_state_dict(torch.load((rnn_model_path)))
+    rnn_model.eval()
+    print("RNN model and scaler loaded successfully.")
+except Exception as e:
+    print(f"Failed to load RNN model or scaler: {e}")
 
 def predict_arima(features, months):
     arima_model = joblib.load('./Backend/SavedModels/arima_model_212.pkl')
@@ -249,7 +244,9 @@ def predict_nn_9(features):
     return formatted_prediction
 
 def predict_rnn(features):
-    features_scaled = rnn_scaler.transform(features)
+    feature_names = ['CPIAUCSL', 'PPIACO', 'PCE', 'FEDFUNDS', 'UNRATE', 'GDP', 'M2SL', 'UMCSENT', 'Overall Wage Growth']
+    features_df = pd.DataFrame(features, columns=feature_names)
+    features_scaled = rnn_scaler.transform(features_df)
     features_tensor = torch.tensor(features_scaled, dtype=torch.float32).unsqueeze(0)
     with torch.no_grad():
         prediction = rnn_model(features_tensor).item()
@@ -287,15 +284,18 @@ async def compare_models(data: ComparisonRequest):
     nn3_features = features[:, :3]  # NN (3 inputs) uses only the first 3 features
     nn9_features = features
     lstm_features = features
+    rnn_features = features
 
     nn3_prediction = predict_nn_3(nn3_features)
     nn9_prediction = predict_nn_9(nn9_features)
     lstm_prediction = predict_lstm(lstm_features)
+    rnn_prediction = predict_rnn(rnn_features)
 
     return {
         "nn3_prediction": nn3_prediction,
         "nn9_prediction": nn9_prediction,
-        "lstm_prediction": lstm_prediction
+        "lstm_prediction": lstm_prediction,
+        "rnn_prediction": rnn_prediction
     }
 
 @app.post("/token")
@@ -417,8 +417,8 @@ async def send_model_scaler(request: Request, data: schemas.ModelRequest, token:
         model_path = "./Backend/SavedModels/9inmodel.pth"
         scaler_path = "./Backend/SavedModels/9inmodelscaler.gz"
     elif model_name == "RNN":
-        model_path = "./Backend/SavedModels/rnn_model.pth"
-        scaler_path = "./Backend/SavedModels/rnn_scaler.gz"
+        model_path = "./Backend/SavedModels/rnnmodel.pth"
+        scaler_path = "./Backend/SavedModels/rnnscaler.gz"
     else:
         return JSONResponse(status_code=400, content={"detail": "Model not supported"})
 
