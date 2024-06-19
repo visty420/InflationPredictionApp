@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy import Column, Date, Integer, Numeric, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -18,6 +18,20 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
 
+class MacroeconomicData(Base):
+    __tablename__ = "macroeconomic_data"
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False)
+    cpi = Column(Numeric(10, 2), nullable=False)
+    ppi = Column(Numeric(10, 2), nullable=False)
+    pce = Column(Numeric(10, 2), nullable=False)
+    fedfunds = Column(Numeric(10, 2), nullable=False)
+    unrate = Column(Numeric(10, 2), nullable=False)
+    gdp = Column(Numeric(10, 2), nullable=False)
+    m2sl = Column(Numeric(10, 2), nullable=False)
+    umcsent = Column(Numeric(10, 2), nullable=False)
+    wagegrowth = Column(Numeric(10, 2), nullable=False)
+    inflrate = Column(Numeric(10, 2), nullable=False)
 
 async_session = sessionmaker(
     engine,

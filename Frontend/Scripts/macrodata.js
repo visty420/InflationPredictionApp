@@ -24,17 +24,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.forEach(row => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${row.DATE}</td>
-                        <td>${row.CPIAUCSL}</td>
-                        <td>${row.PPIACO}</td>
-                        <td>${row.PCE}</td>
-                        <td>${row.FEDFUNDS}</td>
-                        <td>${row.UNRATE}</td>
-                        <td>${row.GDP}</td>
-                        <td>${row.M2SL}</td>
-                        <td>${row.UMCSENT}</td>
-                        <td>${row['Overall Wage Growth']}</td>
-                        <td>${row.INFLRATE}</td>
+                        <td>${row.date}</td>
+                        <td>${row.cpi}</td>
+                        <td>${row.ppi}</td>
+                        <td>${row.pce}</td>
+                        <td>${row.fedfunds}</td>
+                        <td>${row.unrate}</td>
+                        <td>${row.gdp}</td>
+                        <td>${row.m2sl}</td>
+                        <td>${row.umcsent}</td>
+                        <td>${row.wagegrowth}</td>
+                        <td>${row.inflrate}</td>
                     `;
                     tableBody.appendChild(tr);
                 });

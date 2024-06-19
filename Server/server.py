@@ -1,15 +1,17 @@
 from datetime import datetime, timedelta
+from decimal import Decimal
 import logging
 import os
 import aiosmtplib
 from fastapi import FastAPI, Request, Form, HTTPException, Depends, logger, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from jose import JWTError
 import pandas as pd
-from sqlalchemy import select
+from sqlalchemy import desc, select, text
 from . import crud, models, schemas
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession 
@@ -23,7 +25,7 @@ import jwt
 import numpy as np
 import torch
 import csv
-from .models import User, get_db
+from .models import MacroeconomicData, SessionLocal, User, get_db
 from .auth import authenticate_user, oauth2_scheme, verify_token, SECRET_KEY,ALGORITHM
 import smtplib
 from email.mime.text import MIMEText
@@ -116,20 +118,52 @@ async def insert_data(date: str = Form(...), cpi: str = Form(...), ppi: str = Fo
                       pce: str = Form(...), fedfunds: str = Form(...), unrate: str = Form(...),
                       gdp: str = Form(...), m2sl: str = Form(...), umcsent: str = Form(...),
                       wagegrowth: str = Form(...), inflrate: str = Form(...)):
-    data = [date, cpi, ppi, pce, fedfunds, unrate, gdp, m2sl, umcsent, wagegrowth, inflrate]
-    try:
-        with open('./Backend/Data/complete_data.csv', 'a', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(data)
+    async with SessionLocal() as session:
+        async with session.begin():
+            data = MacroeconomicData(
+                date=datetime.strptime(date, "%m/%d/%Y"),
+                cpi=float(cpi),
+                ppi=float(ppi),
+                pce=float(pce),
+                fedfunds=float(fedfunds),
+                unrate=float(unrate),
+                gdp=float(gdp),
+                m2sl=float(m2sl),
+                umcsent=float(umcsent),
+                wagegrowth=float(wagegrowth),
+                inflrate=float(inflrate)
+            )
+            session.add(data)
+        await session.commit()
         return HTMLResponse(content="<script>alert('Data inserted successfully!'); window.location.href='/factors';</script>")
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"An error occurred: {e}")
-    
+   
+def serialize_decimal(obj):
+    if isinstance(obj, Decimal):
+        return float(obj)
+    raise TypeError(f'Object of type {obj.__class__.__name__} is not JSON serializable')
+
 @app.get("/recent_data")
 async def recent_data():
-    csv_file_path = './Backend/Data/complete_data.csv'
-    data = pd.read_csv(csv_file_path).tail(15)
-    return data.to_dict(orient='records')
+    async with SessionLocal() as session:
+        result = await session.execute(text("SELECT * FROM macroeconomic_data ORDER BY date DESC LIMIT 15"))
+        data = result.fetchall()
+        formatted_data = [
+            {
+                "date": row.date.strftime("%m/%d/%Y"),
+                "cpi": serialize_decimal(row.cpi),
+                "ppi": serialize_decimal(row.ppi),
+                "pce": serialize_decimal(row.pce),
+                "fedfunds": serialize_decimal(row.fedfunds),
+                "unrate": serialize_decimal(row.unrate),
+                "gdp": serialize_decimal(row.gdp),
+                "m2sl": serialize_decimal(row.m2sl),
+                "umcsent": serialize_decimal(row.umcsent),
+                "wagegrowth": serialize_decimal(row.wagegrowth),
+                "inflrate": serialize_decimal(row.inflrate)
+            }
+            for row in data
+        ]
+        return JSONResponse(content=formatted_data)
 
 @app.get("/check-email")
 async def check_email(email: str, db: AsyncSession = Depends(get_db)):
