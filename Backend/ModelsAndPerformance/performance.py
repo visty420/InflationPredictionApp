@@ -4,7 +4,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_squared_error  # Import mean_squared_error
 from neural_network import SimpleInflationPredictor
 import pandas as pd
 import numpy as np
@@ -31,7 +31,8 @@ best_params = {
 }
 
 epochs = 600
-fold_performances = []
+fold_performances_r2 = []
+fold_performances_mse = []  # List to store MSE values for each fold
 
 for fold, (train_idx, val_idx) in enumerate(kf.split(X_normalized, target)):
     print(f'Fold {fold+1}/{k_folds}')
@@ -61,10 +62,18 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(X_normalized, target)):
             actuals.extend(batch_y.cpu().numpy())
 
     r2 = r2_score(actuals, predictions)
-    fold_performances.append(r2)
+    mse = mean_squared_error(actuals, predictions)  # Calculate MSE
+    fold_performances_r2.append(r2)
+    fold_performances_mse.append(mse)  # Store MSE value
     print(f'R-squared Score for Fold {fold+1}: {r2 * 100:.2f}%')
+    print(f'MSE for Fold {fold+1}: {mse:.4f}')
 
-average_r2 = np.mean(fold_performances)
-std_dev_r2 = np.std(fold_performances)
+average_r2 = np.mean(fold_performances_r2)
+std_dev_r2 = np.std(fold_performances_r2)
+average_mse = np.mean(fold_performances_mse)  # Calculate average MSE
+std_dev_mse = np.std(fold_performances_mse)  # Calculate standard deviation of MSE
+
 print(f'Average R-squared Score: {average_r2 * 100:.2f}%')
 print(f'Standard Deviation of R-squared Scores: {std_dev_r2 * 100:.2f}%')
+print(f'Average MSE: {average_mse:.4f}')
+print(f'Standard Deviation of MSE: {std_dev_mse:.4f}')

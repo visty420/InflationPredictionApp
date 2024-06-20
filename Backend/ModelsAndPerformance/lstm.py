@@ -7,7 +7,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_squared_error  # Import mean_squared_error
 import pandas as pd
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
@@ -18,7 +18,6 @@ def create_sequences(X, y, sequence_length):
         Xs.append(X[i:(i + sequence_length), :])
         ys.append(y[i + sequence_length])
     return np.array(Xs), np.array(ys)
-
 
 df = pd.read_csv('./Backend/Data/complete_data.csv')
 features = df[['CPIAUCSL', 'PPIACO', 'PCE', 'FEDFUNDS', 'UNRATE', 'GDP', 'M2SL', 'UMCSENT', 'Overall Wage Growth']].values
@@ -33,7 +32,6 @@ X_normalized = scaler.fit_transform(features)
 
 sequence_length = 12  
 X_seq, y_seq = create_sequences(X_normalized, target.flatten(), sequence_length)
-
 
 X_train, X_test, y_train, y_test = train_test_split(X_seq, y_seq, test_size=0.2, random_state=42)
 
@@ -104,4 +102,6 @@ with torch.no_grad():
         actuals.extend(targets.view(-1).cpu().numpy())
 
 r2 = r2_score(actuals, predictions)
+mse = mean_squared_error(actuals, predictions)  # Calculate MSE
 print(f'R-squared: {r2 * 100:.2f}%')
+print(f'MSE: {mse:.4f}')

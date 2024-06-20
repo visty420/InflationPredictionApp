@@ -9,7 +9,7 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 import torch.nn as nn
 import torch.optim as optim
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_squared_error  # Import mean_squared_error
 from torch.utils.tensorboard import SummaryWriter
 
 # Citirea datelor din CSV
@@ -96,10 +96,10 @@ def train_model(model, train_loader, criterion, optimizer, num_epochs=100):
 num_epochs = 400
 train_model(model, train_loader, criterion, optimizer, num_epochs)
 
-# Salvarea modelului
-model_path = './Backend/SavedModels/rnn_model.pth'
-torch.save(model.state_dict(), model_path)
-print(f"Model state dictionary saved to {model_path}")
+# # Salvarea modelului
+# model_path = './Backend/SavedModels/rnn_model.pth'
+# torch.save(model.state_dict(), model_path)
+# print(f"Model state dictionary saved to {model_path}")
 
 # Evaluarea modelului
 model.eval()
@@ -109,8 +109,13 @@ with torch.no_grad():
 
 all_predictions = np.concatenate(all_predictions)
 all_targets = np.concatenate(all_targets)
+
+# Calculează R-squared și MSE
 r2 = r2_score(all_targets, all_predictions)
+mse = mean_squared_error(all_targets, all_predictions)
+
 print(f"R-squared Score: {r2 * 100:.2f}%")
+print(f"MSE: {mse:.4f}")
 
 # Salvarea întregului model
-torch.save(model, './Backend/SavedModels/rnn_model_complete.pth')
+# torch.save(model, './Backend/SavedModels/rnn_model_complete.pth')
