@@ -12,8 +12,8 @@ ts = pd.to_numeric(ts, errors='coerce').dropna()
 model = ARIMA(ts, order=(2, 1, 2))
 results = model.fit()
 
-model_filepath = './Backend/SavedModels/arima_model_212.pkl'
-joblib.dump(results, model_filepath)
+# model_filepath = './Backend/SavedModels/arima_model_212.pkl'
+# joblib.dump(results, model_filepath)
 
 forecast_steps = 5  
 forecast = results.forecast(steps=forecast_steps)

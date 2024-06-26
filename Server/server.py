@@ -117,26 +117,41 @@ async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequ
 async def insert_data(date: str = Form(...), cpi: str = Form(...), ppi: str = Form(...),
                       pce: str = Form(...), fedfunds: str = Form(...), unrate: str = Form(...),
                       gdp: str = Form(...), m2sl: str = Form(...), umcsent: str = Form(...),
-                      wagegrowth: str = Form(...), inflrate: str = Form(...)):
-    async with SessionLocal() as session:
-        async with session.begin():
-            data = MacroeconomicData(
-                date=datetime.strptime(date, "%m/%d/%Y"),
-                cpi=float(cpi),
-                ppi=float(ppi),
-                pce=float(pce),
-                fedfunds=float(fedfunds),
-                unrate=float(unrate),
-                gdp=float(gdp),
-                m2sl=float(m2sl),
-                umcsent=float(umcsent),
-                wagegrowth=float(wagegrowth),
-                inflrate=float(inflrate)
-            )
-            session.add(data)
-        await session.commit()
-        return HTMLResponse(content="<script>alert('Data inserted successfully!'); window.location.href='/factors';</script>")
-   
+                      wagegrowth: str = Form(...), inflrate: str = Form(...), db: AsyncSession = Depends(get_db)):
+    try:
+        # Validarea și conversia inputurilor
+        date = datetime.strptime(date, "%m/%d/%Y")
+        cpi = float(cpi)
+        ppi = float(ppi)
+        pce = float(pce)
+        fedfunds = float(fedfunds)
+        unrate = float(unrate)
+        gdp = float(gdp)
+        m2sl = float(m2sl)
+        umcsent = float(umcsent)
+        wagegrowth = float(wagegrowth)
+        inflrate = float(inflrate)
+    except ValueError:
+        return HTMLResponse(content="<script>alert('Please check the factors. They need to be a date and then numbers.'); window.location='/factors';</script>")
+
+    async with db.begin():
+        data = MacroeconomicData(
+            date=date,
+            cpi=cpi,
+            ppi=ppi,
+            pce=pce,
+            fedfunds=fedfunds,
+            unrate=unrate,
+            gdp=gdp,
+            m2sl=m2sl,
+            umcsent=umcsent,
+            wagegrowth=wagegrowth,
+            inflrate=inflrate
+        )
+        db.add(data)
+    await db.commit()
+    return HTMLResponse(content="<script>alert('Data inserted successfully!'); window.location.href='/factors';</script>")
+
 def serialize_decimal(obj):
     if isinstance(obj, Decimal):
         return float(obj)
