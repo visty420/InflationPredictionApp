@@ -38,7 +38,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="Frontend"), name="static")
 app.mount("/auxiliaries", StaticFiles(directory="Auxiliaries"), name="auxiliaries")
 templates = Jinja2Templates(directory="Frontend/templates")
-SECRET_KEY = "your-secret-key"
+SECRET_KEY = "we_are_predicting_the_inflation"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 PASSWORD_REGEX = r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
@@ -119,7 +119,6 @@ async def insert_data(date: str = Form(...), cpi: str = Form(...), ppi: str = Fo
                       gdp: str = Form(...), m2sl: str = Form(...), umcsent: str = Form(...),
                       wagegrowth: str = Form(...), inflrate: str = Form(...), db: AsyncSession = Depends(get_db)):
     try:
-        # Validarea și conversia inputurilor
         date = datetime.strptime(date, "%m/%d/%Y")
         cpi = float(cpi)
         ppi = float(ppi)
