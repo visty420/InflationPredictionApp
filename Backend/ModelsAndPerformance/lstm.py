@@ -55,17 +55,17 @@ optimal_params = {
     'batch_size': 33
 }
 
-log_dir = "logs/architecture/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-os.makedirs(log_dir, exist_ok=True)
+# log_dir = "logs/architecture/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+# os.makedirs(log_dir, exist_ok=True)
 
-writer = SummaryWriter(log_dir)
+# writer = SummaryWriter(log_dir)
 
 model = LSTMModel(input_dim=X_train.shape[2], hidden_dim=optimal_params['hidden_dim'], num_layers=optimal_params['num_layers'], output_dim=1, dropout_rate=optimal_params['dropout_rate'])
 optimizer = optim.Adam(model.parameters(), lr=optimal_params['lr'])
 criterion = nn.MSELoss()
 
 sample_data = torch.tensor(X_train[:1], dtype=torch.float32)
-writer.add_graph(model, sample_data)
+# writer.add_graph(model, sample_data)
 
 def create_dataloader(X, y, batch_size=64, shuffle=True):
     tensor_X = torch.tensor(X, dtype=torch.float32)
@@ -76,7 +76,7 @@ def create_dataloader(X, y, batch_size=64, shuffle=True):
 train_loader = create_dataloader(X_train, y_train, batch_size=optimal_params['batch_size'])
 test_loader = create_dataloader(X_test, y_test, batch_size=optimal_params['batch_size'], shuffle=False)
 
-num_epochs = 163
+num_epochs = 300
 model.train()
 for epoch in range(num_epochs):
     for inputs, targets in train_loader:
@@ -87,7 +87,7 @@ for epoch in range(num_epochs):
         optimizer.step()
     print(f'Epoch {epoch+1}, Loss: {loss.item()}')
 
-writer.close()
+# writer.close()
 
 # model_path = './Backend/SavedModels/lstm_model.pth'
 # torch.save(model.state_dict(), model_path)
@@ -102,6 +102,6 @@ with torch.no_grad():
         actuals.extend(targets.view(-1).cpu().numpy())
 
 r2 = r2_score(actuals, predictions)
-mse = mean_squared_error(actuals, predictions)  # Calculate MSE
+mse = mean_squared_error(actuals, predictions)  
 print(f'R-squared: {r2 * 100:.2f}%')
 print(f'MSE: {mse:.4f}')
