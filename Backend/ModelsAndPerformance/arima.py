@@ -1,5 +1,6 @@
 import joblib
 import pandas as pd
+from pmdarima import plot_acf, plot_pacf
 from statsmodels.tsa.arima.model import ARIMA
 import matplotlib.pyplot as plt
 
@@ -20,4 +21,11 @@ forecast = results.forecast(steps=forecast_steps)
 print(forecast)
 
 results.plot_diagnostics(figsize=(15, 12))
+plt.show()
+
+fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+plot_acf(ts.diff().dropna(), ax=axes[0])
+axes[0].set_title('Autocorrelation Function (ACF)')
+plot_pacf(ts.diff().dropna(), ax=axes[1])
+axes[1].set_title('Partial Autocorrelation Function (PACF)')
 plt.show()
